@@ -1,0 +1,107 @@
+"use client";
+
+import React from "react";
+import { useRouter } from "next/navigation"; // Import router
+import { Star, Code2, Share2, Trash } from "lucide-react"; // Import Icons
+import { cn } from "@/lib/utils"; // Ensure you have this utility function
+import { Button } from "@/components/ui/button"; // Adjust path based on your project
+
+interface Snippet {
+  id: string;
+  title: string;
+  description: string;
+  code: string;
+  language: string;
+  tags?: string[];
+  isFavorite?: boolean;
+}
+
+interface SnippetCardProps {
+  snippet: Snippet;
+}
+
+const SnippetCard: React.FC<SnippetCardProps> = ({ snippet }) => {
+  const router = useRouter(); // Get router instance
+
+  if (!snippet) {
+    return <p className="text-red-500">Error: Snippet data is missing.</p>;
+  }
+
+  return (
+    <div
+      key={snippet.id}
+      onClick={() => router.push(`/dashboard/snippets/${snippet.id}`)} // Navigate on click
+      className={cn(
+        // Base card styles
+        "group/card relative overflow-hidden",
+        "p-5 rounded-xl border",
+        "bg-white/60 dark:bg-[#1C1917]/40",
+        "backdrop-blur-[12px]",
+        "border-green-200/20 dark:border-green-100/10 shadow-md",
+        // Glow effect that follows cursor
+        "before:absolute before:inset-0 before:-z-10 before:opacity-0 before:transition-opacity before:duration-500",
+        "after:absolute after:inset-0 after:-z-10 after:opacity-0 after:transition-opacity after:duration-500",
+        "after:bg-[radial-gradient(600px_circle_at_var(--mouse-x,0px)_var(--mouse-y,0px),rgba(52,211,153,0.06),transparent_40%)]",
+        "border-green-200/20 dark:border-green-100/10",
+        "hover:shadow-lg hover:shadow-zinc-200/20 dark:hover:shadow-zinc-900/30",
+        "hover:after:opacity-100",
+        // Transition
+        "transition-all duration-200"
+      )}
+      onMouseMove={(e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        e.currentTarget.style.setProperty(
+          "--mouse-x",
+          `${e.clientX - rect.left}px`
+        );
+        e.currentTarget.style.setProperty(
+          "--mouse-y",
+          `${e.clientY - rect.top}px`
+        );
+      }}
+    >
+      {/* Card content without favorite button */}
+      <div className="space-y-4">
+        <div className="flex gap-3">
+          <div className="mt-1 shrink-0">
+            <div className="p-2 rounded-md bg-emerald-50 dark:bg-emerald-500/10">
+              <Code2 className="h-4 w-4 text-emerald-500" />
+            </div>
+          </div>
+          <div>
+            <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 mb-1 pr-8">
+              {snippet.title}
+            </h3>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 line-clamp-2">
+              {snippet.description}
+            </p>
+          </div>
+        </div>
+
+        {/* Language & Tags */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-medium">
+              {snippet.language}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="flex-1 flex flex-wrap gap-2">
+              {snippet.tags?.map((tag) => (
+                <span
+                  key={tag}
+                  className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer transition-colors"
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SnippetCard;
