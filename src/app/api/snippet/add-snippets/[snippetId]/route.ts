@@ -43,7 +43,7 @@ export async function PUT(
     await connectDB();
 
     console.log("🟢 Awaiting params...");
-    const { snippetId } = await context.params; // ✅ Corrected
+    const { snippetId } = await context.params;
 
     console.log("🟢 Validating snippet ID...");
     if (!mongoose.Types.ObjectId.isValid(snippetId.trim())) {
@@ -57,7 +57,7 @@ export async function PUT(
     const { title, description, code, language, tags } = body;
 
     console.log("🟢 Formatting tags...");
-    let formattedTags: string[] = Array.isArray(tags) ? tags.map(String) : [];
+    const formattedTags: string[] = Array.isArray(tags) ? tags.map(String) : [];
 
     console.log("🟢 Updating snippet...");
     const snippet = await Snippet.findByIdAndUpdate(

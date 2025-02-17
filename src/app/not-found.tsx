@@ -65,7 +65,7 @@ export default function NotFound() {
           className="text-gray-400 mb-8 text-lg"
           variants={itemVariants}
         >
-          Oops! It seems the code snippet you're looking for has gone missing in the matrix.
+          Oops! It seems the code snippet you&apos;re looking for has gone missing in the matrix.
         </motion.p>
 
         {/* Code Block */}
@@ -81,7 +81,7 @@ export default function NotFound() {
             </div>
             <div className="text-gray-400 pl-4">
               <span className="text-[#22C55E]">return</span>{" "}
-              <span className="text-orange-400">'404: Page Not Found'</span>;
+              <span className="text-orange-400">&apos;404: Page Not Found&apos;</span>;
             </div>
             <div className="text-gray-400">{"};"}</div>
           </div>

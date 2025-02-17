@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { Settings, User, Clock, Code, Star, Edit } from "lucide-react";
+import { User, Clock, Code, Edit } from "lucide-react";
 import { motion, Variants } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
@@ -76,8 +76,6 @@ const Profile: React.FC = () => {
           },
         });
 
-      
-
         const data = await response.json();
         if (data.success) {
           setUserData(data);
@@ -89,14 +87,14 @@ const Profile: React.FC = () => {
           description: "Failed to load profile data. Please try again.",
           variant: "destructive",
         });
-        router.push("/auth/login"); // Redirect to login if unauthorized
+        router.push("/auth/login");
       } finally {
         setLoading(false);
       }
     };
 
     fetchUserData();
-  }, [toast, router]);
+  }, [toast, router, BASE_URL]);
 
   const stats: StatItem[] = [
     {

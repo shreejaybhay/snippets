@@ -3,8 +3,6 @@ import { User } from "@/models/User";
 import { getUserFromToken } from "@/utils/auth";
 import { connectDB } from "@/lib/db";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
-
 export async function POST(req: NextRequest) {
   await connectDB();
   const user = await getUserFromToken(req);

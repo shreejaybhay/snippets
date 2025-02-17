@@ -112,7 +112,7 @@ const FeaturesSection: React.FC = () => {
                 <code className="text-white">.</code>
                 <code className="text-blue-400">log</code>
                 <code className="text-white">(</code>
-                <code className="text-green-400">"Hello, World!"</code>
+                <code className="text-green-400">&quot;Hello, World!&quot;</code>
                 <code className="text-white">);</code>
                 <br />
                 <code className="text-white">{"}"}</code>

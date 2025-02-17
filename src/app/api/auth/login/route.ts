@@ -4,14 +4,16 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { NextRequest, NextResponse } from "next/server";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+interface LoginRequest {
+  email: string;
+  password: string;
+}
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     await connectDB();
 
-    const { email, password }: { email: string; password: string } =
-      await request.json();
+    const { email, password }: LoginRequest = await request.json();
 
     if (!email || !password) {
       return NextResponse.json(
@@ -36,7 +38,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    if (!process.env.JWT_KEY) {
+    const jwtKey = process.env.JWT_KEY;
+    if (!jwtKey) {
       console.error("Error: JWT_KEY is not defined in environment variables.");
       return NextResponse.json(
         { message: "Server error, try again later", success: false },
@@ -47,7 +50,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // Generate JWT token
     const token = jwt.sign(
       { _id: user._id.toString(), email: user.email },
-      process.env.JWT_KEY,
+      jwtKey,
       { expiresIn: "1d" }
     );
 
@@ -58,7 +61,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       token, // Keep this for debugging
     });
 
-    // ✅ Set the cookie manually using the "Set-Cookie" header
+    // Set the cookie with proper security settings
     response.headers.set(
       "Set-Cookie",
       `authToken=${token}; HttpOnly; Secure=${
@@ -67,8 +70,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
 
     return response;
-  } catch (error: any) {
-    console.error("Login error:", error.message || error);
+  } catch (error) {
+    // Type the error properly
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    console.error("Login error:", errorMessage);
+    
     return NextResponse.json(
       { message: "Something went wrong", success: false },
       { status: 500 }

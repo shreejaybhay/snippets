@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Copy, Loader2, Pencil, Share, Share2, Trash2 } from "lucide-react";
+import { Copy, Pencil, Share2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -78,7 +78,7 @@ const SnippetDetail = () => {
     if (id) {
       fetchSnippet();
     }
-  }, [id, toast]);
+  }, [id, toast, BASE_URL]);
 
   // Handle delete snippet
   const handleDelete = async () => {

@@ -2,9 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { getUserFromToken } from "@/utils/auth";
 import { Snippet } from "@/models/snippets";
-import mongoose from "mongoose";
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export async function POST(req: NextRequest) {
   try {
@@ -39,7 +36,7 @@ export async function POST(req: NextRequest) {
       code,
       language,
       userId: user._id,
-      tags: formattedTags, // ✅ Correctly formatted tags
+      tags: formattedTags,
     });
 
     console.log("✅ Snippet created successfully!");

@@ -3,7 +3,10 @@ import jwt from "jsonwebtoken";
 import { User } from "@/models/User";
 import { connectDB } from "@/lib/db";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+interface JwtPayload {
+  _id: string;
+  [key: string]: any;
+}
 
 export async function getUserFromToken(request: NextRequest) {
   await connectDB();
@@ -33,7 +36,7 @@ export async function getUserFromToken(request: NextRequest) {
       throw new Error("Missing JWT secret in environment variables");
     }
 
-    const decoded: any = jwt.verify(token, jwtSecret);
+    const decoded = jwt.verify(token, jwtSecret) as JwtPayload;
     console.log("🔹 Decoded Token:", decoded);
 
     const userId = decoded._id;

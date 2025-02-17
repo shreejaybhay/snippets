@@ -31,7 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+// Remove unused Switch import
 import {
   AlertDialog,
   AlertDialogAction,
@@ -48,6 +48,15 @@ interface UserData {
   username: string;
   email: string;
   profileURL?: string;
+}
+
+interface Preferences {
+  theme: string;
+  fontSize: string;
+  compactMode: boolean;
+  lineNumbers: boolean;
+  autoSave: boolean;
+  notifications: boolean;
 }
 
 const SettingsPage = () => {
@@ -69,7 +78,7 @@ const SettingsPage = () => {
     deletePassword: "", // Add this new field
   });
 
-  const [preferences, setPreferences] = useState({
+  const [preferences, setPreferences] = useState<Preferences>({
     theme: "system",
     fontSize: "medium",
     compactMode: false,
@@ -81,13 +90,17 @@ const SettingsPage = () => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    fetchUserData();
-    // Load preferences from localStorage
-    const savedPreferences = localStorage.getItem("userPreferences");
-    if (savedPreferences) {
-      setPreferences(JSON.parse(savedPreferences));
-    }
+    const initializeData = async () => {
+      setMounted(true);
+      await fetchUserData();
+      // Load preferences from localStorage
+      const savedPreferences = localStorage.getItem("userPreferences");
+      if (savedPreferences) {
+        setPreferences(JSON.parse(savedPreferences));
+      }
+    };
+
+    initializeData();
   }, []);
 
   const fetchUserData = async () => {
@@ -194,8 +207,8 @@ const SettingsPage = () => {
   };
 
   const handlePreferenceChange = (
-    key: keyof typeof preferences,
-    value: any
+    key: keyof Preferences,
+    value: string | boolean
   ) => {
     setPreferences((prev) => ({ ...prev, [key]: value }));
     localStorage.setItem(

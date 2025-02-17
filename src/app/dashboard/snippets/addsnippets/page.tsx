@@ -8,13 +8,12 @@ import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { X, Code2, Plus } from "lucide-react";
+import { X, Code2 } from "lucide-react";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -225,8 +224,7 @@ export default function AddSnippet() {
         body: JSON.stringify(snippetData),
       });
 
-      const data = await response.json();
-
+      await response.json();
 
       toast({
         title: "Success",

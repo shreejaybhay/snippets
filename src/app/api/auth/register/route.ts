@@ -5,7 +5,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 connectDB();
 
-export async function GET(request: NextRequest): Promise<NextResponse> {
+// Remove unused request parameter by using underscore
+export async function GET(_: NextRequest): Promise<NextResponse> {
   try {
     const users = await User.find().select("-password");
     return NextResponse.json({ users, success: true }, { status: 200 });
@@ -18,6 +19,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   }
 }
 
+interface RegisterRequest {
+  username: string;
+  email: string;
+  password: string;
+  profileURL?: string;
+}
+
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const {
@@ -25,12 +33,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       email,
       password,
       profileURL,
-    }: {
-      username: string;
-      email: string;
-      password: string;
-      profileURL?: string;
-    } = await request.json();
+    }: RegisterRequest = await request.json();
 
     if (password.length < 8) {
       return NextResponse.json(
@@ -58,14 +61,17 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       { message: "Registration successful", user: createdUser, success: true },
       { status: 201 }
     );
-  } catch (error: any) {
-    if (error.code === 11000 && error.keyPattern?.email) {
-      return NextResponse.json(
-        { message: "This email is already registered", success: false },
-        { status: 400 }
-      );
+  } catch (error) {
+    // Replace any with proper error handling
+    if (error instanceof Error) {
+      if ('code' in error && error.code === 11000) {
+        return NextResponse.json(
+          { message: "This email is already registered", success: false },
+          { status: 400 }
+        );
+      }
+      console.error(error);
     }
-    console.error(error);
     return NextResponse.json(
       { message: "Couldn't create user", success: false },
       { status: 500 }

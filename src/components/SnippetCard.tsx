@@ -1,10 +1,9 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation"; // Import router
-import { Star, Code2, Share2, Trash } from "lucide-react"; // Import Icons
-import { cn } from "@/lib/utils"; // Ensure you have this utility function
-import { Button } from "@/components/ui/button"; // Adjust path based on your project
+import { useRouter } from "next/navigation";
+import { Code2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Snippet {
   id: string;
@@ -21,7 +20,7 @@ interface SnippetCardProps {
 }
 
 const SnippetCard: React.FC<SnippetCardProps> = ({ snippet }) => {
-  const router = useRouter(); // Get router instance
+  const router = useRouter();
 
   if (!snippet) {
     return <p className="text-red-500">Error: Snippet data is missing.</p>;
@@ -30,7 +29,7 @@ const SnippetCard: React.FC<SnippetCardProps> = ({ snippet }) => {
   return (
     <div
       key={snippet.id}
-      onClick={() => router.push(`/dashboard/snippets/${snippet.id}`)} // Navigate on click
+      onClick={() => router.push(`/dashboard/snippets/${snippet.id}`)}
       className={cn(
         // Base card styles
         "group/card relative overflow-hidden",
@@ -60,7 +59,6 @@ const SnippetCard: React.FC<SnippetCardProps> = ({ snippet }) => {
         );
       }}
     >
-      {/* Card content without favorite button */}
       <div className="space-y-4">
         <div className="flex gap-3">
           <div className="mt-1 shrink-0">
@@ -78,7 +76,6 @@ const SnippetCard: React.FC<SnippetCardProps> = ({ snippet }) => {
           </div>
         </div>
 
-        {/* Language & Tags */}
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-medium">

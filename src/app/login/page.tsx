@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
-import { AlertCircle } from "lucide-react"; // Import AlertCircle icon
+import { AlertCircle } from "lucide-react";
 
 const Login = () => {
   const router = useRouter();
@@ -17,7 +17,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(""); // Add error state
+  const [errorMessage, setErrorMessage] = useState("");
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
   useEffect(() => {
@@ -27,7 +27,7 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError(""); // Clear previous errors
+    setErrorMessage("");
 
     try {
       const loginRes = await fetch(`${BASE_URL}/api/auth/login`, {
@@ -37,16 +37,14 @@ const Login = () => {
         credentials: "include",
       });
 
-      const data = await loginRes.json();
-
       if (!loginRes.ok) {
-        setError("Invalid email or password"); // Set error message
+        setErrorMessage("Invalid email or password");
         return;
       }
 
       router.push("/dashboard/snippets");
-    } catch (error) {
-      setError("Something went wrong. Please try again."); // Set error message
+    } catch (err) {
+      setErrorMessage("Something went wrong. Please try again.");
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",
@@ -129,10 +127,10 @@ const Login = () => {
               </div>
               
               {/* Error Message */}
-              {error && (
+              {errorMessage && (
                 <div className="flex items-center gap-2 text-sm text-red-500 bg-red-50 dark:bg-red-950/50 p-3 rounded-md">
                   <AlertCircle className="w-4 h-4" />
-                  <span>{error}</span>
+                  <span>{errorMessage}</span>
                 </div>
               )}
 
@@ -145,7 +143,7 @@ const Login = () => {
               </Button>
               <div className="mt-4 text-center text-sm">
                 <span className="text-muted-foreground">
-                  Don't have an account?{" "}
+                  Don&apos;t have an account?{" "}
                   <Link href="/signup" className="text-primary hover:underline">
                     Sign up
                   </Link>

@@ -67,7 +67,6 @@ const MySnippets = () => {
           credentials: "include",
         });
 
-
         const data = await response.json();
         if (data.success) {
           // Sort snippets by creation date (newest first)
@@ -92,7 +91,7 @@ const MySnippets = () => {
     };
 
     fetchUserData();
-  }, [toast]);
+  }, [toast, BASE_URL]);
 
   // Calculate filtered snippets
   const filteredSnippets = userData?.snippets.filter((snippet) =>

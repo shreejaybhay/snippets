@@ -88,7 +88,7 @@ const FavoritesPage = () => {
     };
 
     fetchUserData();
-  }, [toast]);
+  }, [toast, BASE_URL]);
 
   // Get favorite snippets
   const favoriteSnippets = userData?.snippets.filter((snippet) =>

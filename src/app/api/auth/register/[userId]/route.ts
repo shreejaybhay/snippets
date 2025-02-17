@@ -162,9 +162,9 @@ export async function DELETE(
 
 export async function PUT(
   request: NextRequest,
-  context: { params: { userId?: string } } // Mark userId as optional
+  context: { params: { userId?: string } }
 ): Promise<NextResponse> {
-  const { userId } = await context.params; // ✅ Await context.params
+  const { userId } = await context.params;
 
   if (!userId) {
     return NextResponse.json(
@@ -178,8 +178,8 @@ export async function PUT(
   if (authError) return authError;
 
   try {
-    const { username, oldPassword, newPassword, profileURL } =
-      await request.json();
+    // Only destructure what you need
+    const { username, oldPassword, newPassword, profileURL } = await request.json();
 
     const user = await User.findById(userId);
     if (!user) {
@@ -206,7 +206,7 @@ export async function PUT(
     }
 
     const updatedUser = await user.save();
-    const { password, ...userWithoutPassword } = updatedUser.toObject();
+    const { password: _, ...userWithoutPassword } = updatedUser.toObject();
 
     return NextResponse.json({
       message: "User updated successfully",

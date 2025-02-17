@@ -3,8 +3,15 @@
 import { usePathname } from "next/navigation";
 import { Navbar } from "@/components/navbar";
 
+interface User {
+  _id: string;
+  email: string;
+  username: string;
+  profileURL?: string;
+}
+
 interface ClientNavbarProps {
-  user?: any; // Define the user prop
+  user?: User;
 }
 
 export default function ClientNavbar({ user }: ClientNavbarProps) {
@@ -13,5 +20,5 @@ export default function ClientNavbar({ user }: ClientNavbarProps) {
   // Hide navbar for dashboard routes
   if (pathname.startsWith("/dashboard")) return null;
 
-  return <Navbar />;
+  return <Navbar user={user} />;
 }

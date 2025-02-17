@@ -98,7 +98,7 @@ const Signup = () => {
         title: "Success",
         description: "Registration successful! Please login.",
       });
-    } catch (error) {
+    } catch (_) { // Changed 'error' to '_' since we're not using it
       toast({
         title: "Error",
         description: "Failed to register. Please try again later.",

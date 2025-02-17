@@ -76,7 +76,7 @@ export default function EditSnippet() {
     if (id) {
       fetchSnippet();
     }
-  }, [id, toast]);
+  }, [id, toast, BASE_URL]);
 
   const handleTagsChange = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && tagInput.trim() && snippet) {

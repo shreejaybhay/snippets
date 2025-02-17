@@ -6,7 +6,6 @@ const Spotlight = ({
   gradientFirst = "radial-gradient(20% 100% at 50% 0%, hsla(142, 76%, 50%, 0.15) 0%, hsla(142, 76%, 30%, 0.08) 50%, hsla(142, 76%, 20%, 0) 100%)",
   gradientSecond = "radial-gradient(15% 100% at 50% 0%, hsla(240, 4.8%, 70%, 0.1) 0%, hsla(240, 4.8%, 50%, 0.05) 80%, transparent 100%)",
   gradientThird = "radial-gradient(15% 100% at 50% 0%, hsla(27, 87%, 60%, 0.08) 0%, hsla(27, 87%, 40%, 0.04) 80%, transparent 100%)",
-  translateY = 0,
   duration = 6,
   xOffset = 100,
 } = {}) => {
