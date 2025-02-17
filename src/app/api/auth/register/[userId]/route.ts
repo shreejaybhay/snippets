@@ -6,6 +6,11 @@ import { Snippet } from "@/models/snippets";
 import bcrypt from "bcryptjs";
 import { getUserFromToken } from "@/utils/auth";
 
+// Define the params type
+type RouteParams = {
+  params: { userId: string }
+}
+
 async function verifyTokenAndUserId(
   request: NextRequest,
   userId: string
@@ -47,16 +52,11 @@ async function verifyTokenAndUserId(
   }
 }
 
-interface Params {
-  userId: string;
-}
-
 export async function GET(
   request: NextRequest,
-  context: { params: Params }
+  { params }: RouteParams
 ): Promise<NextResponse> {
-  const params = await context.params; // Explicitly await params
-  const userId = params?.userId; // Access userId safely
+  const userId = params.userId;
 
   if (!userId) {
     return NextResponse.json(
@@ -101,10 +101,9 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  context: { params: Params }
+  { params }: RouteParams
 ): Promise<NextResponse> {
-  const params = await context.params;
-  const userId = params?.userId;
+  const userId = params.userId;
 
   if (!userId) {
     return NextResponse.json(
@@ -162,9 +161,9 @@ export async function DELETE(
 
 export async function PUT(
   request: NextRequest,
-  context: { params: { userId?: string } }
+  { params }: RouteParams
 ): Promise<NextResponse> {
-  const { userId } = await context.params;
+  const userId = params.userId;
 
   if (!userId) {
     return NextResponse.json(

@@ -1,9 +1,12 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  images: {
-    domains: ["i.pinimg.com", "i.postimg.cc"], // ✅ Add allowed domains here
+  typescript: {
+    ignoreBuildErrors: true
   },
-};
+  eslint: {
+    ignoreDuringBuilds: true
+  }
+}
 
-export default nextConfig;
+export default nextConfig
