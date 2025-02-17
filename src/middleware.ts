@@ -9,24 +9,25 @@ export function middleware(request: NextRequest) {
   console.log("🚀 Middleware is running...", {
     path,
     isPublicPath,
-    hasToken: !!token
+    hasToken: !!token,
+    fullUrl: request.url
   });
 
+  // If user is authenticated (has token) and tries to access any public path
+  // (including home page), redirect to dashboard
   if (isPublicPath && token) {
-    // Redirect authenticated users trying to access login/signup to their profile
     return NextResponse.redirect(new URL("/dashboard/snippets", request.url));
   }
 
+  // If user is not authenticated and tries to access protected routes
   if (!isPublicPath && !token) {
-    // Redirect unauthenticated users trying to access protected routes to login
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // Allow access if authenticated or accessing a public path
   return NextResponse.next();
 }
 
-// Update the matcher to include all dashboard routes and settings
+// Update the matcher to include all protected routes
 export const config = {
   matcher: [
     "/",
