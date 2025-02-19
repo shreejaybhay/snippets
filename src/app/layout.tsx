@@ -6,11 +6,13 @@ import RootLayoutClient from "@/components/RootLayoutClient";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -32,11 +34,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <RootLayoutClient
-      geistSansClass={geistSans.variable}
-      geistMonoClass={geistMono.variable}
-    >
-      {children}
-    </RootLayoutClient>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <RootLayoutClient
+          geistSansClass={geistSans.variable}
+          geistMonoClass={geistMono.variable}
+        >
+          {children}
+        </RootLayoutClient>
+      </body>
+    </html>
   );
 }

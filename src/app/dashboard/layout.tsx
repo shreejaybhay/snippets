@@ -1,3 +1,5 @@
+"use client";
+
 import AppSidebar from "@/components/app-sidebar";
 import MobileNavbar from "@/components/mobile-sidebar";
 import { Toaster } from "@/components/ui/toaster";
@@ -11,7 +13,7 @@ export default function DashboardLayout({
   return (
     <div className="flex h-screen">
       {/* Sidebar (Hidden on Mobile) */}
-      <div className="hidden md:flex">
+      <div className="hidden md:block">
         <AppSidebar />
       </div>
 
@@ -21,10 +23,12 @@ export default function DashboardLayout({
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 p-6 overflow-y-auto pt-16 md:pt-0 xl:mt-6">
-        <Toaster />
-        {children}
-      </main>
+      <div className="flex-1 overflow-hidden">
+        <main className="h-full overflow-y-auto p-6 pt-16 md:pt-6 xl:mt-6">
+          {children}
+          <Toaster />
+        </main>
+      </div>
     </div>
   );
 }
