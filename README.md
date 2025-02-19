@@ -1,36 +1,107 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CodeSnippets - Your Personal Code Library
 
-## Getting Started
+A modern web application for storing, managing, and sharing code snippets. Built with Next.js, TypeScript, and MongoDB.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Snippet Management**
+  - Create, edit, and delete code snippets
+  - Support for multiple programming languages with syntax highlighting
+  - Add tags and descriptions for better organization
+  - Public/Private snippet visibility options
+
+- **User Experience**
+  - Responsive design for desktop and mobile
+  - Dark/Light mode support
+  - Real-time code editor with syntax highlighting
+  - Quick copy-to-clipboard functionality
+  - Favorite snippets for quick access
+
+- **Search & Organization**
+  - Search through your snippets
+  - Filter by programming language
+  - Tag-based organization
+  - Sort by creation date
+
+## 🛠️ Tech Stack
+
+- **Frontend**
+  - Next.js 14 (App Router)
+  - TypeScript
+  - Tailwind CSS
+  - Framer Motion
+  - CodeMirror
+  - Highlight.js
+
+- **Backend**
+  - MongoDB
+  - Mongoose
+  - Next.js API Routes
+
+## 🚦 Getting Started
+
+1. **Prerequisites**
+   ```bash
+   Node.js 18+ 
+   MongoDB database
+   ```
+
+2. **Environment Setup**
+   Create a `.env.local` file in the root directory:
+   ```env
+   MONGODB_URL=your_mongodb_connection_string
+   NEXT_PUBLIC_BASE_URL=http://localhost:3000
+   JWT_KEY=your_jwt_secret
+   ```
+
+3. **Installation**
+   ```bash
+   # Clone the repository
+   git clone https://github.com/shreejaybhay/snippets.git
+
+   # Install dependencies
+   npm install
+
+   # Run the development server
+   npm run dev
+   ```
+
+4. **Open [http://localhost:3000](http://localhost:3000) with your browser**
+
+## 📁 Project Structure
+
+```
+src/
+├── app/                 # Next.js app router pages
+├── components/         # Reusable UI components
+├── models/            # MongoDB models
+├── lib/               # Utility functions and configurations
+└── utils/             # Helper functions
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🔑 Key Features Implementation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Authentication
+- JWT-based authentication
+- Secure password hashing
+- Protected API routes
+- Middleware for route protection
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Code Editor
+- Syntax highlighting for multiple languages
+- Real-time preview
+- Auto-save functionality
+- Custom themes support
 
-## Learn More
+### Data Management
+- MongoDB integration with Mongoose
+- Efficient data querying
+- Proper error handling
+- Data validation
 
-To learn more about Next.js, take a look at the following resources:
+## 🙏 Acknowledgments
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Next.js](https://nextjs.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [MongoDB](https://www.mongodb.com/)
+- [CodeMirror](https://codemirror.net/)

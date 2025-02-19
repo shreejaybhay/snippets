@@ -2,24 +2,41 @@
 
 import { ThemeProvider } from "@/components/theme-provider";
 import ClientNavbar from "@/components/ClientNavbar";
+import { useEffect, useState } from "react";
 
-export default function RootLayoutClient({ 
+export default function RootLayoutClient({
   children,
   geistSansClass,
-  geistMonoClass 
-}: { 
+  geistMonoClass,
+}: {
   children: React.ReactNode;
   geistSansClass: string;
   geistMonoClass: string;
 }) {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null; // or a loading skeleton
+  }
+
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSansClass} ${geistMonoClass} antialiased`}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <ClientNavbar />
-          {children}
-        </ThemeProvider>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      <body
+        className={`${geistSansClass} ${geistMonoClass} antialiased min-h-screen`}
+        suppressHydrationWarning
+      >
+        <ClientNavbar />
+        {children}
       </body>
-    </html>
+    </ThemeProvider>
   );
 }

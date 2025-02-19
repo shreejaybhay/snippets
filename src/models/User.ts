@@ -1,20 +1,11 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose from "mongoose";
 
-export interface IUser extends Document {
-  username: string;
-  email: string;
-  password: string;
-  profileURL?: string;
-  favorites: mongoose.Types.ObjectId[];
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-const UserSchema = new Schema<IUser>(
+const userSchema = new mongoose.Schema(
   {
     username: {
       type: String,
       required: true,
+      unique: true,
     },
     email: {
       type: String,
@@ -27,12 +18,13 @@ const UserSchema = new Schema<IUser>(
     },
     profileURL: {
       type: String,
-      default: "https://i.postimg.cc/2yj6dtrv/image.jpg",
+      default: "", // Default empty string for no profile image
     },
-    favorites: [{ type: Schema.Types.ObjectId, ref: "Snippet" }], // Favorite snippets
-
+    favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "Snippet" }], // Favorite snippets
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-export const User = mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
+export const User = mongoose.models.User || mongoose.model("User", userSchema);

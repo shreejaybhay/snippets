@@ -17,8 +17,10 @@ interface ClientNavbarProps {
 export default function ClientNavbar({ user }: ClientNavbarProps) {
   const pathname = usePathname();
 
-  // Hide navbar for dashboard routes
-  if (pathname.startsWith("/dashboard")) return null;
+  // Hide navbar only for dashboard routes and public snippet view routes
+  // Remove the check for learn page since we want to show the navbar there
+  if (pathname.startsWith("/dashboard") || pathname.startsWith("/s/")) return null;
 
-  return <Navbar user={user} />;
+  // Add key prop to prevent remounting
+  return <Navbar user={user} key="main-navbar" />;
 }

@@ -8,8 +8,10 @@ import { getUserFromToken } from "@/utils/auth";
 
 // Define the params type
 type RouteParams = {
-  params: { userId: string }
-}
+  params: Promise<{ userId: string }>;
+};
+
+const isDev = process.env.NODE_ENV === "development";
 
 async function verifyTokenAndUserId(
   request: NextRequest,
@@ -18,10 +20,6 @@ async function verifyTokenAndUserId(
   try {
     const authUser = await getUserFromToken(request);
 
-    // Add debug logging
-    console.log("Auth user:", authUser);
-
-    // Check for null first
     if (!authUser) {
       return NextResponse.json(
         { message: "Authentication failed - No user found", success: false },
@@ -29,12 +27,10 @@ async function verifyTokenAndUserId(
       );
     }
 
-    // Safely check if it's an error response
     if (authUser && typeof authUser === "object" && "status" in authUser) {
       return authUser as NextResponse;
     }
 
-    // Now we know authUser is valid, check the ID match
     if (authUser._id.toString() !== userId) {
       return NextResponse.json(
         { message: "Unauthorized - User ID mismatch", success: false },
@@ -44,7 +40,6 @@ async function verifyTokenAndUserId(
 
     return null;
   } catch (error) {
-    console.error("Error in verifyTokenAndUserId:", error);
     return NextResponse.json(
       { message: "Authentication error", success: false },
       { status: 500 }
@@ -56,7 +51,7 @@ export async function GET(
   request: NextRequest,
   { params }: RouteParams
 ): Promise<NextResponse> {
-  const userId = params.userId;
+  const { userId } = await params;
 
   if (!userId) {
     return NextResponse.json(
@@ -69,7 +64,9 @@ export async function GET(
   if (authError) return authError;
 
   await connectDB();
-  console.log("Received userId:", userId);
+  if (isDev) {
+    console.log("Received userId:", userId);
+  }
 
   try {
     if (!mongoose.Types.ObjectId.isValid(userId)) {
@@ -80,8 +77,6 @@ export async function GET(
     }
 
     const user = await User.findById(userId).select("-password");
-    console.log("Fetched user from DB:", user);
-
     if (!user) {
       return NextResponse.json(
         { message: "User not found", success: false },
@@ -103,7 +98,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: RouteParams
 ): Promise<NextResponse> {
-  const userId = params.userId;
+  const { userId } = await params;
 
   if (!userId) {
     return NextResponse.json(
@@ -163,7 +158,7 @@ export async function PUT(
   request: NextRequest,
   { params }: RouteParams
 ): Promise<NextResponse> {
-  const userId = params.userId;
+  const { userId } = await params;
 
   if (!userId) {
     return NextResponse.json(
@@ -178,7 +173,8 @@ export async function PUT(
 
   try {
     // Only destructure what you need
-    const { username, oldPassword, newPassword, profileURL } = await request.json();
+    const { username, oldPassword, newPassword, profileURL } =
+      await request.json();
 
     const user = await User.findById(userId);
     if (!user) {

@@ -1,38 +1,72 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
-  const isPublicPath = path === "/login" || path === "/signup" || path === "/";
+  
+  // Define all public paths - Added '/learn' to the list
+  const publicPaths = ["/login", "/signup", "/", "/learn"];
+  const isPublicPath = publicPaths.includes(path);
+  
+  // Get auth token
   const token = request.cookies.get("authToken")?.value || "";
 
-  // Add debug logging
-  console.log("🚀 Middleware is running...", {
-    path,
-    isPublicPath,
-    hasToken: !!token,
-    fullUrl: request.url
-  });
+  // Create base response with security headers
+  const response = NextResponse.next();
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('X-XSS-Protection', '1; mode=block');
 
-  // If user is authenticated (has token) and tries to access any public path
-  // (including home page), redirect to dashboard
+  // 1. Handle public snippet routes
+  if (path.startsWith('/dashboard/s/')) {
+    return response;
+  }
+
+  // 2. Handle API endpoints
+  if (path.startsWith('/api/')) {
+    // Add rate limiting headers
+    response.headers.set('X-RateLimit-Limit', '100');
+    
+    // Special handling for /api/auth/me endpoint
+    if (path === '/api/auth/me') {
+      response.headers.set('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+      response.headers.set('Pragma', 'no-cache');
+      response.headers.set('Expires', '-1');
+    }
+
+    return response;
+  }
+
+  // 3. Handle authentication redirects
+  if (!isPublicPath && !token) {
+    const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('from', request.nextUrl.pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
   if (isPublicPath && token) {
     return NextResponse.redirect(new URL("/dashboard/snippets", request.url));
   }
 
-  // If user is not authenticated and tries to access protected routes
-  if (!isPublicPath && !token) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-
-  return NextResponse.next();
+  // 4. Allow all other requests
+  return response;
 }
 
-// Update the matcher to include all protected routes
+// Update matcher configuration to include the learn path
 export const config = {
   matcher: [
-    "/",
-    "/login",
-    "/signup",
-    "/dashboard/:path*",  // Matches all dashboard routes
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!_next/static|_next/image|favicon.ico).*)',
+    '/',
+    '/login',
+    '/signup',
+    '/learn',
+    '/dashboard/:path*',
+    '/api/:path*'
   ]
 };

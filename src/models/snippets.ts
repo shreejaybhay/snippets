@@ -5,14 +5,12 @@ export interface ISnippet extends Document {
   description?: string;
   code: string;
   language: string;
-  userId: {
-    _id: mongoose.Types.ObjectId;
-    username: string;
-    profileURL: string;
-  };
+  userId: mongoose.Types.ObjectId;
   tags: string[];
+  isPublic: boolean;
   createdAt: Date;
   updatedAt: Date;
+  __v?: number; // Add the MongoDB version key
 }
 
 const SnippetSchema = new Schema<ISnippet>(
@@ -27,11 +25,12 @@ const SnippetSchema = new Schema<ISnippet>(
       required: true 
     },
     tags: [{ type: String, trim: true }],
+    isPublic: { type: Boolean, default: false, required: true },
   },
   { timestamps: true }
 );
 
 // Add index for better query performance
-SnippetSchema.index({ userId: 1 });
+SnippetSchema.index({ userId: 1, isPublic: 1 });
 
 export const Snippet = mongoose.models.Snippet || mongoose.model<ISnippet>("Snippet", SnippetSchema);

@@ -2,10 +2,12 @@ import { SpotlightNewDemo } from "@/components/HomePage";
 
 
 
+
+
 export default function Home() {
   return (
-    <div>
+    <main>
       <SpotlightNewDemo/>
-    </div>
+    </main>
   );
 }

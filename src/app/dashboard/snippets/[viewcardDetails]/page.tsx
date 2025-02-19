@@ -1,27 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Copy, Pencil, Share2, Trash2 } from "lucide-react";
+import { Copy, Pencil, Share2, Trash2, Globe, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import hljs from "highlight.js";
-import "highlight.js/styles/atom-one-dark.css"; // ✅ Verified dark mode-friendly theme
+import "highlight.js/styles/atom-one-light.css"; // For light mode
+import "highlight.js/styles/atom-one-dark.css"; // For dark mode
 import { motion } from "framer-motion";
 import { useParams, useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { DeleteModal } from "@/components/ui/delete-modal";
 
 interface Snippet {
   _id: string;
@@ -31,6 +22,7 @@ interface Snippet {
   language: string;
   tags: string[];
   createdAt: string;
+  isPublic: boolean;
 }
 
 const SnippetDetail = () => {
@@ -43,15 +35,19 @@ const SnippetDetail = () => {
   const router = useRouter();
   const { toast } = useToast();
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // Fetch snippet data from API
   useEffect(() => {
     const fetchSnippet = async () => {
       try {
-        const response = await fetch(`${BASE_URL}/api/snippet/add-snippets/${id}`, {
-          method: "GET",
-          credentials: "include",
-        });
+        const response = await fetch(
+          `${BASE_URL}/api/snippet/add-snippets/${id}`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
 
         if (!response.ok) {
           throw new Error("Failed to fetch snippet");
@@ -83,10 +79,13 @@ const SnippetDetail = () => {
   // Handle delete snippet
   const handleDelete = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/api/snippet/add-snippets/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${BASE_URL}/api/snippet/add-snippets/${id}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to delete snippet");
@@ -122,6 +121,51 @@ const SnippetDetail = () => {
     }
   };
 
+  const handleVisibilityToggle = async () => {
+    if (!snippet) return; // Early return if snippet is null
+
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/snippet/add-snippets/${id}/visibility`,
+        {
+          method: "PATCH",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            isPublic: !snippet.isPublic,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update visibility");
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setSnippet((prev) => ({
+          ...prev!,
+          isPublic: !prev!.isPublic,
+        }));
+        toast({
+          title: "Success",
+          description: `Snippet is now ${
+            !snippet.isPublic ? "public" : "private"
+          }`,
+        });
+      }
+    } catch (error) {
+      console.error("Error updating visibility:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update snippet visibility",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -141,32 +185,42 @@ const SnippetDetail = () => {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.3, ease: "easeInOut" }}
-      className={cn(
-        // Base card styles
-        "group/card relative overflow-hidden",
-        "p-3 sm:p-5 mt-5", // Added margin-top for mobile
-        "rounded-xl border",
-        "bg-white/60 dark:bg-[#1C1917]/40 shadow-md",
-        "backdrop-blur-[12px]",
-        "border-green-200/20 dark:border-green-100/10",
-        "space-y-4 sm:space-y-6", // Adjusted spacing for mobile
-        // Glow effect that follows cursor (desktop only)
-        "sm:before:absolute sm:before:inset-0 sm:before:-z-10 sm:before:opacity-0 sm:before:transition-opacity sm:before:duration-500",
-        "sm:after:absolute sm:after:inset-0 sm:after:-z-10 sm:after:opacity-0 sm:after:transition-opacity sm:after:duration-500",
-        "sm:after:bg-[radial-gradient(600px_circle_at_var(--mouse-x,0px)_var(--mouse-y,0px),rgba(52,211,153,0.06),transparent_80%)]",
-        "dark:hover:border-zinc-700",
-        "hover:shadow-lg dark:hover:shadow-zinc-900/30",
-        "hover:after:opacity-100",
-        // Transition
-        "transition-all duration-200"
-      )}
-      onMouseMove={(e) => {
-        if (window.innerWidth > 640) { // Only track mouse on desktop
+    <>
+      <DeleteModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onDelete={handleDelete}
+      />
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        className={cn(
+          // Responsive width and padding
+          "w-full max-w-[98%] sm:max-w-[95%] lg:max-w-[85%] xl:max-w-[100%] mx-auto",
+          "group/card relative overflow-hidden",
+          "p-2 sm:p-4 lg:p-8", // Reduced padding on mobile
+          "mt-5 sm:mt-2", // Reduced top margin on mobile
+          "rounded-xl border",
+          "bg-white/60 dark:bg-[#1C1917]/40",
+          "shadow-xl",
+          "backdrop-blur-[12px]",
+          "border-green-200/20 dark:border-green-100/10",
+          "space-y-2 sm:space-y-4", // Reduced spacing on mobile
+          "hover:border-green-500/20 dark:hover:border-green-500/10",
+          // Glow effect that follows cursor
+          "before:absolute before:inset-0 before:-z-10 before:opacity-0 before:transition-opacity before:duration-500",
+          "after:absolute after:inset-0 after:-z-10 after:opacity-0 after:transition-opacity after:duration-500",
+          "after:bg-[radial-gradient(800px_circle_at_var(--mouse-x,0px)_var(--mouse-y,0px),rgba(52,211,153,0.08),transparent_50%)]",
+          "border-green-200/20 dark:border-green-100/10",
+          "hover:shadow-lg hover:shadow-zinc-200/20 dark:hover:shadow-zinc-900/30",
+          "hover:after:opacity-100",
+          // Transition
+          "transition-all duration-200"
+        )}
+        onMouseMove={(e) => {
           const rect = e.currentTarget.getBoundingClientRect();
           e.currentTarget.style.setProperty(
             "--mouse-x",
@@ -176,168 +230,194 @@ const SnippetDetail = () => {
             "--mouse-y",
             `${e.clientY - rect.top}px`
           );
-        }
-      }}
-    >
-      {/* Title Section with animation */}
-      <motion.div
-        initial={{ opacity: 0, x: -10 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.4, delay: 0.1 }}
-        className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0"
+        }}
       >
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white break-words">
-          {snippet.title}
-        </h1>
-        <Badge variant="outline" className="self-start sm:self-center text-gray-600 dark:text-gray-300">
-          {snippet.language.toUpperCase()}
-        </Badge>
-      </motion.div>
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4">
+          <div className="space-y-1 sm:space-y-2 w-full sm:w-auto">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-green-500 to-emerald-700 bg-clip-text text-transparent">
+              {snippet.title}
+            </h1>
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              <Badge
+                variant="outline"
+                className="px-2 py-0.5 text-xs sm:text-sm font-medium bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-green-500/20"
+              >
+                {snippet.language.toUpperCase()}
+              </Badge>
+              <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                {new Date(snippet.createdAt).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })}
+              </span>
+            </div>
+          </div>
 
-      {/* Description with animation */}
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4, delay: 0.2 }}
-        className="text-base sm:text-lg text-gray-600 dark:text-gray-400"
-      >
-        {snippet.description}
-      </motion.p>
+          {/* Action Buttons */}
+          <div className="flex items-center space-x-1 sm:space-x-1.5 bg-gray-100 dark:bg-zinc-800/50 rounded-lg p-1 w-full sm:w-auto justify-end sm:justify-start">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => {
+                const shareUrl = snippet.isPublic
+                  ? `${window.location.origin}/dashboard/s/${id}`
+                  : window.location.href;
 
-      {/* Tags with animation */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.4, delay: 0.3 }}
-        className="flex flex-wrap gap-2"
-      >
-        {snippet.tags?.map((tag: string) => (
-          <Badge
-            key={tag}
-            className="text-sm bg-green-500/20 text-green-500 hover:bg-green-500/20"
-          >
-            #{tag}
-          </Badge>
-        ))}
-      </motion.div>
+                navigator
+                  .share({
+                    title: snippet.title,
+                    text: snippet.description,
+                    url: shareUrl,
+                  })
+                  .catch(() => {
+                    navigator.clipboard.writeText(shareUrl);
+                    toast({
+                      title: "Link Copied!",
+                      description: "Share link has been copied to clipboard",
+                    });
+                  });
+              }}
+              className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-white dark:hover:bg-zinc-700 transition-colors rounded-md"
+            >
+              <Share2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-500" />
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleVisibilityToggle}
+              className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-white dark:hover:bg-zinc-700 transition-colors rounded-md"
+            >
+              {snippet.isPublic ? (
+                <Globe className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-500" />
+              ) : (
+                <Lock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-yellow-500" />
+              )}
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() =>
+                router.push(`/dashboard/snippets/editsnippets/${id}`)
+              }
+              className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-white dark:hover:bg-zinc-700 transition-colors rounded-md"
+            >
+              <Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-500" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowDeleteModal(true)}
+              className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-white dark:hover:bg-zinc-700 transition-colors rounded-md"
+            >
+              <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-500" />
+            </Button>
+          </div>
+        </div>
 
-      {/* Code Section with animation */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.4 }}
-      >
-        <Card className="relative bg-zinc-900 text-white rounded-xl shadow-lg overflow-hidden">
-          <CardContent className="p-3 sm:p-5">
-            <div className="relative overflow-x-auto max-w-full rounded-lg scrollbar-hide">
-              <pre className="relative p-2 sm:p-4 rounded-lg break-words whitespace-pre-wrap text-sm sm:text-base">
-                <code
-                  dangerouslySetInnerHTML={{
-                    __html: hljs.highlight(snippet.code, {
-                      language: snippet.language || "plaintext",
-                    }).value,
-                  }}
-                />
-              </pre>
+        {/* Description and Tags */}
+        <div className="space-y-2 sm:space-y-3">
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
+            {snippet.description}
+          </p>
+          <div className="flex flex-wrap gap-1.5 sm:gap-2">
+            {snippet.tags?.map((tag: string) => (
+              <Badge
+                key={tag}
+                className={cn(
+                  "px-1.5 sm:px-2 py-0.5",
+                  "text-[10px] sm:text-xs",
+                  "bg-zinc-100 dark:bg-zinc-800/50",
+                  "hover:bg-zinc-200 dark:hover:bg-zinc-800",
+                  "text-zinc-600 dark:text-zinc-400",
+                  "border border-zinc-200/20 dark:border-zinc-700/30",
+                  "transition-all duration-200",
+                  "font-medium"
+                )}
+              >
+                #{tag}
+              </Badge>
+            ))}
+          </div>
+        </div>
+
+        {/* iOS-style Code Window */}
+        <div className="relative">
+          <Card className="relative bg-white dark:bg-zinc-900 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800">
+            {/* Window Header */}
+            <div className="flex items-center justify-between px-2 sm:px-4 py-1.5 sm:py-2 bg-[#F3F4F6] dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
+              <div className="flex items-center gap-1 sm:gap-1.5">
+                <div className="flex gap-1.5 sm:gap-2">
+                  <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#FF5F56]" />
+                  <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#FFBD2E]" />
+                  <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#27C93F]" />
+                </div>
+                <div className="ml-2 sm:ml-3 flex items-center gap-1.5 sm:gap-2">
+                  <span className="text-[10px] sm:text-xs text-zinc-600 dark:text-zinc-400 font-medium">
+                    {snippet.language}
+                  </span>
+                  <div className="h-2.5 sm:h-3 w-[1px] bg-zinc-300 dark:bg-zinc-700" />
+                  <span className="text-[10px] sm:text-xs text-zinc-500">
+                    {snippet.code.split("\n").length} lines
+                  </span>
+                </div>
+              </div>
+              <Button
+                onClick={handleCopy}
+                size="sm"
+                variant="ghost"
+                className={cn(
+                  "h-6 sm:h-7 transition-all duration-200",
+                  copied
+                    ? "bg-green-500/10 text-green-600 hover:bg-green-500/20 dark:text-green-400"
+                    : "hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
+                )}
+              >
+                {copied ? (
+                  <span className="text-[10px] sm:text-xs">Copied!</span>
+                ) : (
+                  <Copy className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                )}
+              </Button>
             </div>
 
-            {/* Copy Button with animation */}
-            <Button
-              onClick={handleCopy}
-              size="sm"
-              className={cn(
-                "absolute top-2 right-2 sm:top-3 sm:right-3 flex items-center gap-1 px-2 sm:px-3 py-1 sm:py-1.5",
-                copied ? "bg-green-500 text-white" : "bg-gray-800 text-gray-300"
-              )}
-            >
-              {copied ? "Copied!" : <Copy className="h-4 w-4" />}
-            </Button>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      {/* Bottom Actions */}
-      <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.5 }}
-          className="text-sm text-gray-500 dark:text-gray-400"
-        >
-          Created on {new Date(snippet.createdAt).toLocaleDateString()}
-        </motion.p>
-        
-        {/* Action Buttons */}
-        <div className="flex items-center gap-2 self-end sm:self-auto">
-          {/* Edit Button */}
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => router.push(`/dashboard/snippets/editsnippets/${id}`)}
-            className="hover:bg-blue-500/10 text-gray-600 dark:text-gray-300 bg-[#252726]"
-          >
-            <Pencil className="h-4 w-4 sm:h-5 sm:w-5 text-green-500" />
-          </Button>
-
-          {/* Share Button */}
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() =>
-              navigator.share({
-                title: snippet.title,
-                text: snippet.description,
-                url: window.location.href,
-              })
-            }
-            className="hover:bg-green-500/10 text-gray-600 dark:text-gray-300 bg-[#252726]"
-          >
-            <Share2 className="h-4 w-4 sm:h-5 sm:w-5" />
-          </Button>
-
-          {/* Delete Button */}
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button
-                variant="destructive"
-                size="sm"
-                className="bg-red-500/90 hover:bg-red-500 text-white dark:bg-red-600/90 dark:hover:bg-red-600"
+            {/* Code Content */}
+            <div className="max-h-[300px] sm:max-h-[400px] overflow-hidden">
+              <div
+                className={cn(
+                  "overflow-y-auto",
+                  "overflow-x-hidden",
+                  "max-h-[300px] sm:max-h-[400px]",
+                  "p-2 sm:p-4",
+                  "bg-[#F3F4F6] dark:bg-zinc-900",
+                  "text-[11px] sm:text-sm leading-relaxed",
+                  // Scrollbar styling
+                  "scrollbar-thin scrollbar-thumb-zinc-300 dark:scrollbar-thumb-zinc-700",
+                  "scrollbar-track-transparent",
+                  "hover:overflow-x-auto",
+                  "[&::-webkit-scrollbar-horizontal]:hidden",
+                  "[-ms-overflow-style:none]",
+                  "[scrollbar-width:none]",
+                  // ... (syntax highlighting classes)
+                )}
               >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent className="bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/20 dark:border-zinc-700/30 backdrop-blur-xl max-w-[90vw] sm:max-w-lg">
-              <AlertDialogHeader className="space-y-3">
-                <AlertDialogTitle className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
-                  Delete Snippet
-                </AlertDialogTitle>
-                <AlertDialogDescription className="text-zinc-600 dark:text-zinc-400 text-base">
-                  Are you sure you want to delete this snippet? This action
-                  cannot be undone and will permanently remove the snippet from
-                  your collection.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter className="mt-6 flex-col sm:flex-row gap-2 sm:gap-0">
-                <AlertDialogCancel
-                  className="bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 
-                  text-zinc-900 dark:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-700/80 
-                  transition-colors w-full sm:w-auto"
-                >
-                  Cancel
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleDelete}
-                  className="bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 
-                  text-white transition-colors w-full sm:w-auto"
-                >
-                  Delete Snippet
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+                <pre className="text-[11px] sm:text-sm leading-relaxed">
+                  <code
+                    className={`font-mono language-${snippet.language}`}
+                    dangerouslySetInnerHTML={{
+                      __html: hljs.highlight(snippet.code, {
+                        language: snippet.language || "plaintext",
+                      }).value,
+                    }}
+                  />
+                </pre>
+              </div>
+            </div>
+          </Card>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    </>
   );
 };
 

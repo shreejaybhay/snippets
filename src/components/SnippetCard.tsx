@@ -66,11 +66,11 @@ const SnippetCard: React.FC<SnippetCardProps> = ({ snippet }) => {
               <Code2 className="h-4 w-4 text-emerald-500" />
             </div>
           </div>
-          <div>
-            <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 mb-1 pr-8">
+          <div className="min-w-0">
+            <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 mb-1 pr-8 truncate">
               {snippet.title}
             </h3>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 line-clamp-2">
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 line-clamp-1">
               {snippet.description}
             </p>
           </div>
@@ -84,11 +84,11 @@ const SnippetCard: React.FC<SnippetCardProps> = ({ snippet }) => {
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="flex-1 flex flex-wrap gap-2">
+            <div className="flex-1 flex flex-wrap gap-2 max-h-6 overflow-hidden">
               {snippet.tags?.map((tag) => (
                 <span
                   key={tag}
-                  className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer transition-colors"
+                  className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer transition-colors truncate max-w-[150px]"
                 >
                   #{tag}
                 </span>

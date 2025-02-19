@@ -313,37 +313,31 @@ const SettingsPage = () => {
 
   return (
     <motion.div
-      className="p-6 max-w-[1200px] mx-auto relative z-0"
+      className="p-3 sm:p-6 max-w-[1200px] mx-auto relative z-0 mt-2 sm:mt-0"
       initial="hidden"
       animate="visible"
       variants={fadeIn}
     >
-      <motion.div
-        className="flex items-center gap-2 mb-6"
-        variants={fadeIn}
-        transition={{ delay: 0.1 }}
-      >
-        <Settings className="w-6 h-6 text-[#22C55E]" />
-        <h1 className="text-2xl font-semibold">Settings</h1>
-      </motion.div>
 
-      <Tabs defaultValue="account" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="account">Account</TabsTrigger>
-          <TabsTrigger value="preferences">Preferences</TabsTrigger>
+      <Tabs defaultValue="account" className="space-y-4 sm:space-y-6">
+        <TabsList className="w-full sm:w-auto">
+          <TabsTrigger value="account" className="flex-1 sm:flex-none">Account</TabsTrigger>
+          <TabsTrigger value="preferences" className="flex-1 sm:flex-none">Preferences</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="account" className="space-y-6">
+        <TabsContent value="account" className="space-y-4 sm:space-y-6">
           {/* Profile Settings */}
           <Card className="dark:bg-[#1C1917]/40 border dark:border-green-100/10">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="w-5 h-5 text-[#22C55E]" />
+            <CardHeader className="space-y-2 sm:space-y-3">
+              <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                <User className="w-4 h-4 sm:w-5 sm:h-5 text-[#22C55E]" />
                 Profile Settings
               </CardTitle>
-              <CardDescription>Manage your account information</CardDescription>
+              <CardDescription className="text-sm sm:text-base">
+                Manage your account information
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3 sm:space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="username">Username</Label>
                 <Input
@@ -385,16 +379,18 @@ const SettingsPage = () => {
             </CardContent>
           </Card>
 
-          {/* Password Settings */}
+          {/* Security Settings */}
           <Card className="dark:bg-[#1C1917]/40 border dark:border-green-100/10">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <KeyRound className="w-5 h-5 text-[#22C55E]" />
-                Change Password
+            <CardHeader className="space-y-2 sm:space-y-3">
+              <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                <KeyRound className="w-4 h-4 sm:w-5 sm:h-5 text-[#22C55E]" />
+                Security
               </CardTitle>
-              <CardDescription>Update your password</CardDescription>
+              <CardDescription className="text-sm sm:text-base">
+                Update your password
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3 sm:space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="currentPassword">Current Password</Label>
                 <Input
@@ -443,21 +439,20 @@ const SettingsPage = () => {
             </CardContent>
           </Card>
 
-          <Card className="dark:bg-[#1C1917]/40 border dark:border-green-100/10">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-red-500">
-                <Trash2 className="w-5 h-5" />
-                Delete Account
+          {/* Danger Zone */}
+          <Card className="dark:bg-[#1C1917]/40 border dark:border-red-500/10">
+            <CardHeader className="space-y-2 sm:space-y-3">
+              <CardTitle className="flex items-center gap-2 text-lg sm:text-xl text-red-500">
+                <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5" />
+                Danger Zone
               </CardTitle>
-              <CardDescription>
-                Permanently delete your account and all associated data
+              <CardDescription className="text-sm sm:text-base">
+                Permanently delete your account
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3 sm:space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="deletePassword">
-                  Enter Password to Confirm
-                </Label>
+                <Label htmlFor="deletePassword">Enter Password to Confirm</Label>
                 <Input
                   id="deletePassword"
                   type="password"
@@ -482,28 +477,30 @@ const SettingsPage = () => {
             </CardContent>
           </Card>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end mt-4 sm:mt-6">
             <Button
               onClick={handleAccountUpdate}
               disabled={loading}
-              className="px-8"
+              className="w-full sm:w-auto px-8"
             >
               {loading ? "Saving..." : "Save Settings"}
             </Button>
           </div>
         </TabsContent>
 
-        <TabsContent value="preferences" className="space-y-6">
+        <TabsContent value="preferences" className="space-y-4 sm:space-y-6">
           <Card className="dark:bg-[#1C1917]/40 border dark:border-green-100/10">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Monitor className="w-5 h-5 text-[#22C55E]" />
+            <CardHeader className="space-y-2 sm:space-y-3">
+              <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                <Monitor className="w-4 h-4 sm:w-5 sm:h-5 text-[#22C55E]" />
                 Appearance
               </CardTitle>
-              <CardDescription>Customize your experience</CardDescription>
+              <CardDescription className="text-sm sm:text-base">
+                Customize your experience
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
+            <CardContent className="space-y-3 sm:space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
                 <Label htmlFor="theme">Theme</Label>
                 <Select
                   value={theme}
@@ -512,7 +509,7 @@ const SettingsPage = () => {
                     handlePreferenceChange("theme", value);
                   }}
                 >
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-full sm:w-[180px]">
                     <SelectValue placeholder="Select theme" />
                   </SelectTrigger>
                   <SelectContent>

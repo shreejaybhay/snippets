@@ -28,7 +28,7 @@ const Footer = () => {
         </motion.span>
 
         <motion.a
-          href="https://github.com"
+          href="https://github.com/shreejaybhay"
           target="_blank"
           rel="noopener noreferrer"
           initial={{ opacity: 0 }}

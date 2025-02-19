@@ -1,22 +1,22 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { ToastProvider } from "@/components/ui/toast";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Upload, Save, X } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "../../../../hooks/use-toast";
+import { ToastProvider } from "../../../../components/ui/toast";
+import { Card, CardContent, CardHeader } from "../../../../components/ui/card";
+import { Button } from "../../../../components/ui/button";
+import { Label } from "../../../../components/ui/label";
+import { Input } from "../../../../components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../../../../components/ui/dialog";
 
 interface Profile {
   username: string;
@@ -33,7 +33,7 @@ const ProfileEdit = () => {
     profileURL: "",
     id: "",
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [newProfileURL, setNewProfileURL] = useState("");
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -43,7 +43,7 @@ const ProfileEdit = () => {
       try {
         const res = await fetch(`${BASE_URL}/api/auth/me`, {
           method: "GET",
-          credentials: "include", // Important: include cookies
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
@@ -69,11 +69,13 @@ const ProfileEdit = () => {
           description: "Failed to load profile. Please try again.",
           variant: "destructive",
         });
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchProfile();
-  }, [toast]);
+  }, [toast, BASE_URL]);
 
   const handleSave = async () => {
     if (!profile.username.trim()) {
@@ -90,7 +92,7 @@ const ProfileEdit = () => {
     try {
       const res = await fetch(`${BASE_URL}/api/auth/register/${profile.id}`, {
         method: "PUT",
-        credentials: "include", // Important: include cookies
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -138,6 +140,18 @@ const ProfileEdit = () => {
       description: "Your profile picture has been changed successfully.",
     });
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
+        <div className="relative w-4 h-8 text-transparent">
+          <div className="absolute top-0 left-[-20px] w-3.5 h-8 bg-[#10B981] animate-loader"></div>
+          <div className="absolute top-0 left-0 w-3.5 h-8 bg-[#10B981] animate-loader delay-150"></div>
+          <div className="absolute top-0 left-[20px] w-3.5 h-8 bg-[#10B981] animate-loader delay-300"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <ToastProvider>

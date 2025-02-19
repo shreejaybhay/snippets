@@ -43,19 +43,19 @@ const MySnippets = () => {
   const handleFavoriteChange = (snippetId: string, isFavorited: boolean) => {
     if (!userData) return;
 
-    setUserData(prevData => {
+    setUserData((prevData) => {
       if (!prevData) return null;
 
       const newFavorites = isFavorited
         ? [...prevData.user.favorites, snippetId]
-        : prevData.user.favorites.filter(id => id !== snippetId);
+        : prevData.user.favorites.filter((id) => id !== snippetId);
 
       return {
         ...prevData,
         user: {
           ...prevData.user,
-          favorites: newFavorites
-        }
+          favorites: newFavorites,
+        },
       };
     });
   };
@@ -70,14 +70,15 @@ const MySnippets = () => {
         const data = await response.json();
         if (data.success) {
           // Sort snippets by creation date (newest first)
-          const sortedSnippets = [...data.snippets].sort((a, b) => 
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          const sortedSnippets = [...data.snippets].sort(
+            (a, b) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           );
           setUserData({
             ...data,
-            snippets: sortedSnippets
+            snippets: sortedSnippets,
           });
-        } 
+        }
       } catch (error) {
         console.error("Error fetching user data:", error);
         toast({
@@ -94,10 +95,13 @@ const MySnippets = () => {
   }, [toast, BASE_URL]);
 
   // Calculate filtered snippets
-  const filteredSnippets = userData?.snippets.filter((snippet) =>
-    snippet.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    snippet.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    snippet.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredSnippets = userData?.snippets.filter(
+    (snippet) =>
+      snippet.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      snippet.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      snippet.tags.some((tag) =>
+        tag.toLowerCase().includes(searchTerm.toLowerCase())
+      )
   );
 
   // Get most recent snippet title
@@ -142,9 +146,12 @@ const MySnippets = () => {
           },
           {
             title: "Today's",
-            count: userData?.snippets.filter(snippet => 
-              new Date(snippet.createdAt).toDateString() === new Date().toDateString()
-            ).length || 0,
+            count:
+              userData?.snippets.filter(
+                (snippet) =>
+                  new Date(snippet.createdAt).toDateString() ===
+                  new Date().toDateString()
+              ).length || 0,
             icon: <PlusCircle size={20} className="text-blue-500" />,
           },
           {
@@ -171,8 +178,8 @@ const MySnippets = () => {
             </h2>
             <h1
               className={`mt-1 sm:mt-2 font-bold ${
-                item.isRecent 
-                  ? "text-lg sm:text-2xl line-clamp-1" 
+                item.isRecent
+                  ? "text-lg sm:text-2xl line-clamp-1"
                   : "text-2xl sm:text-4xl"
               } truncate`}
             >
@@ -216,18 +223,22 @@ const MySnippets = () => {
         {filteredSnippets && filteredSnippets.length > 0 ? (
           filteredSnippets.map((snippet) => (
             <div key={snippet._id} className="group relative">
-              <div 
+              <div
                 className="absolute top-3 right-3 sm:top-4 sm:right-4 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-10"
-                style={{ touchAction: 'none' }} // Better touch handling
+                style={{ touchAction: "none" }} // Better touch handling
               >
                 <FavoriteButton
                   snippetId={snippet._id}
-                  isFavorited={userData?.user.favorites.includes(snippet._id) || false}
+                  isFavorited={
+                    userData?.user.favorites.includes(snippet._id) || false
+                  }
                   onFavoriteChange={handleFavoriteChange}
                 />
               </div>
-              <div 
-                onClick={() => router.push(`/dashboard/snippets/${snippet._id}`)}
+              <div
+                onClick={() =>
+                  router.push(`/dashboard/snippets/${snippet._id}`)
+                }
                 className="active:opacity-80 transition-opacity" // Better touch feedback
               >
                 <SnippetCard

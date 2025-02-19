@@ -12,16 +12,21 @@ export async function GET(
     console.log("🟢 Connecting to database...");
     await connectDB();
 
-    const { snippetId } = await context.params; // Await the params object
+    const { snippetId } = await context.params;
 
     console.log("🟢 Fetching snippet...");
-    const snippet = await Snippet.findById(snippetId);
+    const snippet = await Snippet.findById(snippetId).lean();
 
     if (!snippet) {
       return NextResponse.json(
         { message: "Snippet not found", success: false },
         { status: 404 }
       );
+    }
+
+    // Ensure isPublic is included in the response
+    if (typeof snippet.isPublic === 'undefined') {
+      snippet.isPublic = false;
     }
 
     return NextResponse.json({ snippet, success: true });
@@ -100,7 +105,7 @@ export async function DELETE(
     }
 
     console.log("🟢 Validating snippet ID...");
-    const { snippetId } = await params; // Await the params object
+    const { snippetId } = await params;
     const cleanedSnippetId = snippetId.trim();
     if (!mongoose.Types.ObjectId.isValid(cleanedSnippetId)) {
       return NextResponse.json(
@@ -132,6 +137,39 @@ export async function DELETE(
     console.error("🔴 Error deleting snippet:", error);
     return NextResponse.json(
       { message: "Error deleting snippet", success: false },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(
+  req: NextRequest,
+  context: { params: { snippetId: string } }
+) {
+  try {
+    await connectDB();
+    const { snippetId } = context.params;
+    const body = await req.json();
+    const { isPublic } = body;
+
+    const snippet = await Snippet.findByIdAndUpdate(
+      snippetId,
+      { isPublic },
+      { new: true }
+    );
+
+    if (!snippet) {
+      return NextResponse.json(
+        { message: "Snippet not found", success: false },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ success: true, snippet });
+  } catch (error) {
+    console.error("Error updating snippet visibility:", error);
+    return NextResponse.json(
+      { message: "Error updating snippet", success: false },
       { status: 500 }
     );
   }

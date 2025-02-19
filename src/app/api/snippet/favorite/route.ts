@@ -13,11 +13,21 @@ export async function POST(req: NextRequest) {
   if (!snippetId)
     return NextResponse.json({ error: "Snippet ID required" }, { status: 400 });
 
-  await User.findByIdAndUpdate(user._id, {
-    $addToSet: { favorites: snippetId },
-  });
+  try {
+    await User.findByIdAndUpdate(user._id, {
+      $addToSet: { favorites: snippetId },
+    });
 
-  return NextResponse.json({ message: "Snippet added to favorites" });
+    return NextResponse.json({ 
+      message: "Snippet added to favorites",
+      success: true 
+    });
+  } catch (error) {
+    console.error("Error adding favorite:", error);
+    return NextResponse.json({ 
+      error: "Failed to add favorite" 
+    }, { status: 500 });
+  }
 }
 
 export async function DELETE(req: NextRequest) {
@@ -30,9 +40,21 @@ export async function DELETE(req: NextRequest) {
   if (!snippetId)
     return NextResponse.json({ error: "Snippet ID required" }, { status: 400 });
 
-  await User.findByIdAndUpdate(user._id, { $pull: { favorites: snippetId } });
+  try {
+    await User.findByIdAndUpdate(user._id, { 
+      $pull: { favorites: snippetId } 
+    });
 
-  return NextResponse.json({ message: "Snippet removed from favorites" });
+    return NextResponse.json({ 
+      message: "Snippet removed from favorites",
+      success: true 
+    });
+  } catch (error) {
+    console.error("Error removing favorite:", error);
+    return NextResponse.json({ 
+      error: "Failed to remove favorite" 
+    }, { status: 500 });
+  }
 }
 
 export async function GET(req: NextRequest) {
@@ -41,6 +63,19 @@ export async function GET(req: NextRequest) {
   if (!user)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const userData = await User.findById(user._id).populate("favorites");
-  return NextResponse.json(userData.favorites);
+  try {
+    const userData = await User.findById(user._id)
+      .populate("favorites")
+      .select("favorites");
+
+    return NextResponse.json({
+      favorites: userData.favorites,
+      success: true
+    });
+  } catch (error) {
+    console.error("Error fetching favorites:", error);
+    return NextResponse.json({ 
+      error: "Failed to fetch favorites" 
+    }, { status: 500 });
+  }
 }

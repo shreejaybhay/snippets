@@ -11,10 +11,10 @@ interface FavoriteButtonProps {
   onFavoriteChange?: (snippetId: string, isFavorited: boolean) => void;
 }
 
-export default function FavoriteButton({ 
-  snippetId, 
+export default function FavoriteButton({
+  snippetId,
   isFavorited,
-  onFavoriteChange 
+  onFavoriteChange,
 }: FavoriteButtonProps) {
   const [favorite, setFavorite] = useState(isFavorited);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,7 +22,7 @@ export default function FavoriteButton({
   const toggleFavorite = async (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent event bubbling
     setIsLoading(true);
-    
+
     try {
       const method = favorite ? "DELETE" : "POST";
       const response = await fetch("/api/snippet/favorite", {
