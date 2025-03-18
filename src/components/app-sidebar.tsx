@@ -13,6 +13,8 @@ import {
   LogOut,
   LogIn,
   UserPlus,
+  FolderIcon,
+  Rss,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { ModeToggle } from "@/components/ui/mode-toggle";
@@ -68,7 +70,7 @@ const AppSidebar = () => {
   // Show loading state
   if (isLoading || isAuthenticated === null) {
     return (
-      <div className="fixed top-0 left-0 bottom-0 w-64 dark:bg-[#1C1917]/40 text-sidebar-foreground border-r border-sidebar-border flex flex-col shadow-lg">
+      <div className="fixed top-0 left-0 bottom-0 w-64 dark:bg-[#161514] text-sidebar-foreground border-r border-sidebar-border flex flex-col shadow-lg">
         {/* Header with logo skeleton */}
         <div className="flex items-center h-14 px-4 border-b border-sidebar-border">
           <div className="flex items-center gap-3 w-full">
@@ -125,11 +127,25 @@ const AppSidebar = () => {
       path: "/dashboard/snippets",
     },
     {
+      name: "Feed",
+      icon: <Rss size={22} />,
+      path: "/dashboard/feed",
+    },
+    {
+      name: "Folders",
+      icon: <FolderIcon size={22} />,
+      path: "/dashboard/folders",
+    },
+    {
       name: "Favorites",
       icon: <Star size={22} />,
       path: "/dashboard/favorites",
     },
-    { name: "Profile", icon: <User size={22} />, path: "/dashboard/profile" },
+    { 
+      name: "Profile", 
+      icon: <User size={22} />, 
+      path: "/dashboard/profile" 
+    },
     {
       name: "Settings",
       icon: <Settings size={22} />,
@@ -141,7 +157,7 @@ const AppSidebar = () => {
     <motion.div
       animate={{ width: collapsed ? (isMobile ? 0 : 64) : 256 }}
       transition={{ type: "spring", stiffness: 120, damping: 15 }}
-      className={`h-screen dark:bg-[#1C1917]/40 text-sidebar-foreground border-r border-sidebar-border flex flex-col shadow-lg ${
+      className={`h-screen dark:bg-[#161514] text-sidebar-foreground border-r border-sidebar-border flex flex-col shadow-lg ${
         isMobile && collapsed ? "hidden" : "block"
       }`}
     >

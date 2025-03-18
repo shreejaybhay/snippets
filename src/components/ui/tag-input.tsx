@@ -58,8 +58,14 @@ export function TagInput({
   return (
     <div
       className={cn(
-        "flex flex-wrap gap-2 rounded-md border bg-transparent p-1.5",
-        "border-input focus-within:ring-2 focus-within:ring-emerald-500/20",
+        "flex flex-wrap gap-1.5 sm:gap-2 rounded-md border-2 border-input bg-background px-3 py-2",
+        "dark:bg-[#1C1917]/60 bg-background/50",
+        "placeholder:text-muted-foreground",
+        "outline-none focus:outline-none focus-visible:outline-none",
+        "ring-0 focus:ring-0 focus-visible:ring-0",
+        "focus-within:border-emerald-500/20 dark:focus-within:border-emerald-500/15",
+        "disabled:cursor-not-allowed disabled:opacity-50",
+        "transition-all duration-200",
         className
       )}
       onClick={() => inputRef.current?.focus()}
@@ -67,22 +73,20 @@ export function TagInput({
       {value.map((tag) => (
         <Badge
           key={tag}
-          variant="secondary"
-          className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300
-            hover:bg-emerald-500/20 transition-colors"
+          className="px-2 sm:px-2.5 py-0.5 h-6 sm:h-7 text-xs sm:text-sm 
+            bg-emerald-500/10 hover:bg-emerald-500/15 text-emerald-700 dark:text-emerald-300
+            border border-emerald-500/20 transition-colors duration-200"
         >
           #{tag}
           <button
             type="button"
-            className="ml-1 rounded-full outline-none hover:text-emerald-900 
-              dark:hover:text-emerald-100 focus:text-emerald-900 
-              dark:focus:text-emerald-100"
+            className="ml-1 cursor-pointer hover:text-emerald-900 dark:hover:text-emerald-100"
             onClick={(e) => {
               e.stopPropagation();
               removeTag(tag);
             }}
           >
-            <X className="h-3 w-3" />
+            <X className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
           </button>
         </Badge>
       ))}
@@ -94,7 +98,9 @@ export function TagInput({
         onKeyDown={handleKeyDown}
         onBlur={handleBlur}
         placeholder={placeholder}
-        className="flex-1 border-0 bg-transparent p-0 text-sm placeholder:text-muted-foreground 
+        className="flex-1 min-w-[100px] sm:min-w-[120px] h-6 sm:h-7 
+          bg-transparent border-0 p-0 text-xs sm:text-sm 
+          placeholder:text-muted-foreground text-foreground
           focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
         {...props}
       />

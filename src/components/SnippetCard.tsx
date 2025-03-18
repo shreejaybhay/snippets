@@ -11,12 +11,15 @@ interface Snippet {
   description: string;
   code: string;
   language: string;
-  tags?: string[];
+  tags: string[];
+  createdAt: string;
   isFavorite?: boolean;
+  isPinned?: boolean;
 }
 
 interface SnippetCardProps {
   snippet: Snippet;
+  onMove?: (snippetId: string) => Promise<void>; // Make it optional with '?'
 }
 
 const SnippetCard: React.FC<SnippetCardProps> = ({ snippet }) => {
@@ -34,9 +37,11 @@ const SnippetCard: React.FC<SnippetCardProps> = ({ snippet }) => {
         // Base card styles
         "group/card relative overflow-hidden",
         "p-5 rounded-xl border",
-        "bg-white/60 dark:bg-[#1C1917]/40",
+        "bg-white/60 dark:bg-[#161514]",
         "backdrop-blur-[12px]",
         "border-green-200/20 dark:border-green-100/10 shadow-md",
+        // Make card content more readable in single column
+        "md:max-w-3xl md:mx-auto md:w-full",
         // Glow effect that follows cursor
         "before:absolute before:inset-0 before:-z-10 before:opacity-0 before:transition-opacity before:duration-500",
         "after:absolute after:inset-0 after:-z-10 after:opacity-0 after:transition-opacity after:duration-500",

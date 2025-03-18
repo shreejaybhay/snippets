@@ -1,107 +1,165 @@
 # CodeSnippets - Your Personal Code Library
 
-A modern web application for storing, managing, and sharing code snippets. Built with Next.js, TypeScript, and MongoDB.
+A modern web application for storing, managing, and sharing code snippets. Built with Next.js 15+, TypeScript, and MongoDB.
 
 ## 🚀 Features
 
-- **Snippet Management**
-  - Create, edit, and delete code snippets
-  - Support for multiple programming languages with syntax highlighting
-  - Add tags and descriptions for better organization
-  - Public/Private snippet visibility options
+### Authentication & Security
+- ✅ JWT-based authentication with cookie secure handling
+- ✅ Protected API routes with middleware validation
+- ✅ Secure password handling with bcrypt
+- ✅ Token-based session management
+- ✅ HTTP-only cookies for enhanced security
+- ✅ Rate limiting protection
+- ✅ Edge runtime support for auth routes
 
-- **User Experience**
-  - Responsive design for desktop and mobile
-  - Dark/Light mode support
-  - Real-time code editor with syntax highlighting
-  - Quick copy-to-clipboard functionality
-  - Favorite snippets for quick access
+### Snippet Management
+- ✅ Create, edit, and delete code snippets
+- ✅ Advanced code editor with CodeMirror 6
+- ✅ Multiple language support with syntax highlighting
+- ✅ Folder organization system
+- ✅ Tag-based categorization
+- ✅ Public/Private visibility controls
+- ✅ Snippet forking capability
+- ✅ Snippet embedding system
+- ✅ Favorites and pinned snippets
+- ✅ Analytics tracking
+- ✅ Comment system with likes
 
-- **Search & Organization**
-  - Search through your snippets
-  - Filter by programming language
-  - Tag-based organization
-  - Sort by creation date
+### Social Features
+- ✅ User feed with activity updates
+- ✅ Follow/Unfollow system
+- ✅ User profiles with customization
+- ✅ Leaderboard system
+- ✅ Real-time notifications
+- ✅ Comment threads and discussions
+- ✅ Like system for snippets and comments
+
+### Achievement System
+- ✅ Dynamic achievement tracking
+- ✅ Multiple achievement categories
+- ✅ Real-time progress updates
+- ✅ Achievement notifications
+- ✅ Daily streak tracking
+- ✅ User analytics integration
+
+### User Experience
+- ✅ Responsive design with Tailwind CSS
+- ✅ Dark/Light theme switching
+- ✅ Toast notification system
+- ✅ Loading states and animations
+- ✅ Real-time updates with SSE
+- ✅ Mobile-friendly interface
+- ✅ Command palette for quick actions
+- ✅ Breadcrumb navigation
 
 ## 🛠️ Tech Stack
 
-- **Frontend**
-  - Next.js 14 (App Router)
-  - TypeScript
-  - Tailwind CSS
-  - Framer Motion
-  - CodeMirror
-  - Highlight.js
+- **Frontend**: 
+  - Next.js 15.1.7
+  - TypeScript 5
+  - Tailwind CSS 3.4
+  - Shadcn UI Components
+  - CodeMirror 6
+  - Framer Motion 12.4
 
-- **Backend**
-  - MongoDB
-  - Mongoose
+- **Backend**: 
   - Next.js API Routes
+  - MongoDB with Mongoose 8.10
+  - JWT Authentication
+  - Server-Sent Events (SSE)
+  - Edge Runtime Support
+  - Rate Limiting
 
-## 🚦 Getting Started
+- **Features**: 
+  - Real-time notifications
+  - Social interactions
+  - Achievement system
+  - Analytics tracking
+  - File management
+  - Code embedding
 
-1. **Prerequisites**
+## 🚀 Getting Started
+
+1. **Clone the repository**
    ```bash
-   Node.js 18+ 
-   MongoDB database
+   git clone https://github.com/shreejaybhay/snippets.git
+   cd snippets
    ```
 
 2. **Environment Setup**
-   Create a `.env.local` file in the root directory:
+   Create a `.env.local` file:
    ```env
    MONGODB_URL=your_mongodb_connection_string
    NEXT_PUBLIC_BASE_URL=http://localhost:3000
    JWT_KEY=your_jwt_secret
+   CLOUDINARY_CLOUD_NAME=your_cloud_name
+   CLOUDINARY_API_KEY=your_api_key
+   CLOUDINARY_API_SECRET=your_api_secret
    ```
 
 3. **Installation**
    ```bash
-   # Clone the repository
-   git clone https://github.com/shreejaybhay/snippets.git
-
-   # Install dependencies
    npm install
-
-   # Run the development server
    npm run dev
    ```
 
-4. **Open [http://localhost:3000](http://localhost:3000) with your browser**
+4. **Open [http://localhost:3000](http://localhost:3000)**
+
+## 🔧 Development
+
+- **Running Development Server**
+  ```bash
+  npm run dev
+  ```
+
+- **Building for Production**
+  ```bash
+  npm run build
+  ```
+
+- **Linting**
+  ```bash
+  npm run lint
+  ```
 
 ## 📁 Project Structure
 
 ```
 src/
-├── app/                 # Next.js app router pages
-├── components/         # Reusable UI components
-├── models/            # MongoDB models
-├── lib/               # Utility functions and configurations
-└── utils/             # Helper functions
+├── app/
+│   ├── api/                 # API routes
+│   │   ├── achievements/    # Achievement endpoints
+│   │   ├── analytics/       # Analytics tracking
+│   │   ├── auth/           # Authentication
+│   │   ├── feed/           # User feed
+│   │   ├── folders/        # Folder management
+│   │   ├── leaderboard/    # Leaderboard system
+│   │   ├── notifications/  # Real-time notifications
+│   │   ├── snippet/        # Snippet operations
+│   │   └── users/          # User management
+│   ├── dashboard/          # Dashboard pages
+│   ├── learn/             # Learning resources
+│   ├── login/             # Authentication pages
+│   └── signup/            # Registration pages
+├── components/
+│   ├── ui/                # Reusable UI components
+│   └── [feature]/         # Feature-specific components
+├── config/                # Configuration files
+├── hooks/                # Custom React hooks
+├── lib/                  # Core utilities
+├── models/               # MongoDB schemas
+├── services/             # Business logic
+├── types/                # TypeScript definitions
+└── utils/                # Helper functions
 ```
 
-## 🔑 Key Features Implementation
+## 🤝 Contributing
 
-### Authentication
-- JWT-based authentication
-- Secure password hashing
-- Protected API routes
-- Middleware for route protection
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-### Code Editor
-- Syntax highlighting for multiple languages
-- Real-time preview
-- Auto-save functionality
-- Custom themes support
+## 📝 License
 
-### Data Management
-- MongoDB integration with Mongoose
-- Efficient data querying
-- Proper error handling
-- Data validation
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 🙏 Acknowledgments
 
-- [Next.js](https://nextjs.org/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [MongoDB](https://www.mongodb.com/)
-- [CodeMirror](https://codemirror.net/)

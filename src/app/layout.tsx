@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
+
 export const metadata: Metadata = {
   title: "Snippets - Code Sharing Platform",
   description: "Share and manage your code snippets easily",
@@ -35,12 +36,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
         <RootLayoutClient
           geistSansClass={geistSans.variable}
           geistMonoClass={geistMono.variable}
         >
-          {children}
+            {children}
         </RootLayoutClient>
       </body>
     </html>

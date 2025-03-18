@@ -1,26 +1,16 @@
-import { connectDB } from "@/lib/db";
-import { User } from "@/models/User";
+import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { NextRequest, NextResponse } from "next/server";
+import { connectDB } from "@/lib/db";
+import { calculateStreak } from "@/utils/streakCalculator";
+import { trackAchievementProgress } from "@/utils/achievementTracker";
+import { User } from "@/models/User";
 
-interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export async function POST(request: NextRequest): Promise<NextResponse> {
+export async function POST(req: NextRequest) {
   try {
     await connectDB();
 
-    const { email, password }: LoginRequest = await request.json();
-
-    if (!email || !password) {
-      return NextResponse.json(
-        { message: "Email and password are required", success: false },
-        { status: 400 }
-      );
-    }
+    const { email, password } = await req.json();
 
     const user = await User.findOne({ email });
     if (!user) {
@@ -38,45 +28,72 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    const jwtKey = process.env.JWT_KEY;
-    if (!jwtKey) {
-      console.error("Error: JWT_KEY is not defined in environment variables.");
-      return NextResponse.json(
-        { message: "Server error, try again later", success: false },
-        { status: 500 }
-      );
+    // Calculate current streak
+    const currentStreak = user.dailyStreak || 0;
+    const streakIncrement = calculateStreak(user.lastLoginDate);
+    const newStreak = currentStreak + streakIncrement;
+
+    // Update user's last login date and streak
+    const updatedUser = await User.findByIdAndUpdate(
+      user._id,
+      { 
+        lastLoginDate: new Date(),
+        dailyStreak: newStreak
+      },
+      { new: true }
+    );
+
+    // Track streak-related achievements
+    if (updatedUser) {
+      await Promise.all([
+        trackAchievementProgress(
+          updatedUser._id.toString(),
+          'streak-starter',
+          newStreak
+        ),
+        trackAchievementProgress(
+          updatedUser._id.toString(),
+          'weekly-warrior',
+          newStreak
+        )
+      ]);
     }
 
-    // Generate JWT token
     const token = jwt.sign(
       { _id: user._id.toString(), email: user.email },
-      jwtKey,
-      { expiresIn: "1d" }
+      process.env.JWT_KEY as string,
+      { 
+        expiresIn: "1d",
+        algorithm: 'HS256' // Explicitly specify the algorithm
+      }
     );
 
     const response = NextResponse.json({
       message: "Login successful",
       success: true,
-      user: { _id: user._id, email: user.email, profileURL: user.profileURL },
-      token, // Keep this for debugging
+      user: { 
+        _id: user._id, 
+        email: user.email, 
+        profileURL: user.profileURL,
+        dailyStreak: newStreak
+      },
+      token
     });
 
-    // Set the cookie with proper security settings
-    response.headers.set(
-      "Set-Cookie",
-      `authToken=${token}; HttpOnly; Secure=${
-        process.env.NODE_ENV === "production"
-      }; SameSite=Strict; Max-Age=86400; Path=/`
-    );
+    // Set the cookie with proper settings
+    response.cookies.set("authToken", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: 24 * 60 * 60 // 1 day in seconds
+    });
 
     return response;
   } catch (error) {
-    // Type the error properly
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    console.error("Login error:", errorMessage);
-    
+    console.error("Login error:", error);
     return NextResponse.json(
-      { message: "Something went wrong", success: false },
+      { message: "Login failed", success: false },
       { status: 500 }
     );
   }

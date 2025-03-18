@@ -24,6 +24,7 @@ interface SnippetDocument extends mongoose.Document {
 
 interface FormattedSnippet {
   _id: mongoose.Types.ObjectId;
+  id: string;
   title: string;
   description: string;
   code: string;
@@ -78,6 +79,7 @@ export async function GET(req: NextRequest, context: RouteContext) {
 
     const formattedSnippet: FormattedSnippet = {
       _id: snippet._id,
+      id: snippet._id.toString(),
       title: snippet.title,
       description: snippet.description,
       code: snippet.code,

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X, FileText, Star, User, Settings, LogOut, Code } from "lucide-react";
+import { Menu, X, FileText, Star, User, Settings, LogOut, Code, FolderIcon, Rss } from "lucide-react";
 import { ModeToggle } from "./ui/mode-toggle";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
@@ -64,6 +64,16 @@ const MobileSidebar = () => {
       name: "Snippets",
       icon: <FileText size={22} />,
       path: "/dashboard/snippets",
+    },
+    {
+      name: "Feed",
+      icon: <Rss size={22} />,
+      path: "/dashboard/feed",
+    },
+    {
+      name: "Folders",
+      icon: <FolderIcon size={22} />,
+      path: "/dashboard/folders",
     },
     {
       name: "Favorites",

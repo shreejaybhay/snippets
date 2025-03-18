@@ -30,13 +30,10 @@ export default function RootLayoutClient({
       enableSystem
       disableTransitionOnChange
     >
-      <body
-        className={`${geistSansClass} ${geistMonoClass} antialiased min-h-screen`}
-        suppressHydrationWarning
-      >
+      <div className={`${geistSansClass} ${geistMonoClass} antialiased min-h-screen`}>
         <ClientNavbar />
         {children}
-      </body>
+      </div>
     </ThemeProvider>
   );
 }

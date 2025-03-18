@@ -7,7 +7,7 @@ export async function POST(_: NextRequest): Promise<NextResponse> {
             success: true 
         });
 
-        // Clear the authToken cookie by setting an expired date
+        // Clear the authToken cookie
         response.cookies.set("authToken", "", { 
             expires: new Date(0),
             path: "/",
@@ -15,6 +15,9 @@ export async function POST(_: NextRequest): Promise<NextResponse> {
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict"
         });
+
+        // Clear any other auth-related cookies if they exist
+        response.cookies.delete("authToken");
 
         return response;
     } catch (error) {

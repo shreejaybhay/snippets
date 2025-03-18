@@ -9,7 +9,13 @@ const AlertDialog = AlertDialogPrimitive.Root
 
 const AlertDialogTrigger = AlertDialogPrimitive.Trigger
 
-const AlertDialogPortal = AlertDialogPrimitive.Portal
+const AlertDialogPortal = ({
+  className,
+  ...props
+}: AlertDialogPrimitive.AlertDialogPortalProps) => (
+  <AlertDialogPrimitive.Portal className={cn(className)} {...props} />
+)
+AlertDialogPortal.displayName = AlertDialogPrimitive.Portal.displayName
 
 const AlertDialogOverlay = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Overlay>,
@@ -17,8 +23,9 @@ const AlertDialogOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPrimitive.Overlay
     className={cn(
-      "fixed inset-0 z-50 bg-zinc-950/60 backdrop-blur-sm",
-      "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      "fixed inset-0 z-50 bg-black/80 backdrop-blur-sm",
+      "data-[state=open]:animate-in data-[state=closed]:animate-out",
+      "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className
     )}
     {...props}
@@ -30,22 +37,27 @@ AlertDialogOverlay.displayName = AlertDialogPrimitive.Overlay.displayName
 const AlertDialogContent = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Content>
->(({ className, ...props }, ref) => (
+>(({ className, children, ...props }, ref) => (
   <AlertDialogPortal>
-    <AlertDialogOverlay />
-    <AlertDialogPrimitive.Content
-      ref={ref}
-      className={cn(
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%]",
-        "p-6 shadow-lg duration-200",
-        "bg-white/80 dark:bg-zinc-900/80 border border-zinc-200/20 dark:border-zinc-700/30",
-        "backdrop-blur-xl rounded-lg",
-        "data-[state=open]:animate-in data-[state=closed]:animate-out",
-        "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-        className
-      )}
-      {...props}
-    />
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <AlertDialogOverlay />
+      <AlertDialogPrimitive.Content
+        ref={ref}
+        className={cn(
+          "fixed z-50 grid w-full max-w-lg scale-100",
+          "p-6 shadow-lg duration-200",
+          "bg-background dark:bg-[#161514] border border-border/50 dark:border-green-100/10",
+          "backdrop-blur-xl rounded-lg",
+          "data-[state=open]:animate-in data-[state=closed]:animate-out",
+          "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+          "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </AlertDialogPrimitive.Content>
+    </div>
   </AlertDialogPortal>
 ))
 AlertDialogContent.displayName = AlertDialogPrimitive.Content.displayName
@@ -111,10 +123,10 @@ const AlertDialogAction = React.forwardRef<
     className={cn(
       "inline-flex h-10 items-center justify-center rounded-md px-4 py-2",
       "text-sm font-semibold",
-      "bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700",
+      "bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-700",
       "text-white shadow-sm",
       "transition-colors duration-200",
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2",
+      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2",
       "disabled:pointer-events-none disabled:opacity-50",
       className
     )}
@@ -132,11 +144,11 @@ const AlertDialogCancel = React.forwardRef<
     className={cn(
       "mt-2 inline-flex h-10 items-center justify-center rounded-md px-4 py-2",
       "text-sm font-semibold",
-      "bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700",
-      "text-zinc-900 dark:text-zinc-100",
-      "hover:bg-zinc-200 dark:hover:bg-zinc-700/80",
+      "bg-background dark:bg-[#161514] border border-border/50 dark:border-green-100/10",
+      "text-foreground dark:text-zinc-100",
+      "hover:bg-muted dark:hover:bg-zinc-800/80",
       "transition-colors duration-200",
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2",
+      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
       "disabled:pointer-events-none disabled:opacity-50",
       "sm:mt-0",
       className

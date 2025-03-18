@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { getUserFromToken } from "@/utils/auth";
 import { Snippet } from "@/models/snippets";
+import { trackAchievementProgress } from "@/utils/achievementTracker";
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,7 +12,7 @@ export async function POST(req: NextRequest) {
     console.log("🟢 Authenticating user...");
     const user = await getUserFromToken(req);
     if (!user || user instanceof NextResponse) {
-      return user; // If it's a NextResponse, return it
+      return user;
     }
 
     console.log("🟢 Parsing request body...");
@@ -38,6 +39,21 @@ export async function POST(req: NextRequest) {
       userId: user._id,
       tags: formattedTags,
     });
+
+    // Get total snippets count for the user
+    const totalSnippets = await Snippet.countDocuments({ userId: user._id });
+
+    // Track achievements
+    await Promise.all([
+      // Track "Snippet Creator" achievement (first snippet)
+      trackAchievementProgress(user._id.toString(), 'snippet-creator', 1),
+      // Track "Snippet Collector" achievement (total snippets)
+      trackAchievementProgress(user._id.toString(), 'snippet-collector', totalSnippets),
+      // Track "Code Master" achievement (total snippets)
+      trackAchievementProgress(user._id.toString(), 'code-master', totalSnippets),
+      // Track general snippets created metric
+      trackAchievementProgress(user._id.toString(), 'snippetsCreated', totalSnippets)
+    ]);
 
     console.log("✅ Snippet created successfully!");
     return NextResponse.json({

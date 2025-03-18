@@ -1,10 +1,10 @@
 import { connectDB } from "@/lib/db";
-import { User } from "@/models/User";
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { Snippet } from "@/models/snippets";
 import bcrypt from "bcryptjs";
 import { getUserFromToken } from "@/utils/auth";
+import { User } from "@/models/User";
 
 // Define the params type
 type RouteParams = {
@@ -167,13 +167,12 @@ export async function PUT(
     );
   }
 
-  // Authenticate the request
   const authError = await verifyTokenAndUserId(request, userId);
   if (authError) return authError;
 
   try {
-    // Only destructure what you need
-    const { username, oldPassword, newPassword, profileURL } =
+    // Update to include bannerURL
+    const { username, oldPassword, newPassword, profileURL, bannerURL } =
       await request.json();
 
     const user = await User.findById(userId);
@@ -184,9 +183,10 @@ export async function PUT(
       );
     }
 
-    // Update username & profile picture
+    // Update username, profile picture & banner
     if (username) user.username = username;
     if (profileURL) user.profileURL = profileURL;
+    if (bannerURL) user.bannerURL = bannerURL;
 
     // Handle password update
     if (newPassword && oldPassword) {

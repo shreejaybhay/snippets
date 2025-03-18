@@ -1,7 +1,8 @@
 import bcrypt from "bcryptjs";
 import { connectDB } from "@/lib/db";
-import { User } from "@/models/User";
 import { NextRequest, NextResponse } from "next/server";
+import { trackAchievementProgress } from "@/utils/achievementTracker";
+import { User } from "@/models/User";
 
 connectDB();
 
@@ -54,9 +55,18 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       email,
       password: hashedPassword,
       profileURL,
+      joinDate: new Date() // Make sure this field exists in your User model
     });
 
     const createdUser = await user.save();
+
+    // Track the registration achievement
+    await trackAchievementProgress(
+      createdUser._id.toString(),
+      'joinDate',
+      1 // For boolean achievements, 1 indicates completion
+    );
+
     return NextResponse.json(
       { message: "Registration successful", user: createdUser, success: true },
       { status: 201 }

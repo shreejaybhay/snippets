@@ -3,13 +3,14 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { Upload, Save, X } from "lucide-react";
+import { Upload, Save, X, Camera, ArrowLeft } from "lucide-react";
 import { useToast } from "../../../../hooks/use-toast";
 import { ToastProvider } from "../../../../components/ui/toast";
 import { Card, CardContent, CardHeader } from "../../../../components/ui/card";
 import { Button } from "../../../../components/ui/button";
 import { Label } from "../../../../components/ui/label";
 import { Input } from "../../../../components/ui/input";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -22,20 +23,25 @@ interface Profile {
   username: string;
   email: string;
   profileURL: string;
+  bannerURL: string;
   id: string;
 }
 
 const ProfileEdit = () => {
   const { toast } = useToast();
+  const router = useRouter();
   const [profile, setProfile] = useState<Profile>({
     username: "",
     email: "",
     profileURL: "",
+    bannerURL: "",
     id: "",
   });
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showBannerModal, setShowBannerModal] = useState(false);
   const [newProfileURL, setNewProfileURL] = useState("");
+  const [newBannerURL, setNewBannerURL] = useState("");
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
   useEffect(() => {
@@ -59,6 +65,7 @@ const ProfileEdit = () => {
             username: data.user.username,
             email: data.user.email,
             profileURL: data.user.profileURL,
+            bannerURL: data.user.bannerURL,
             id: data.user._id,
           });
         }
@@ -99,6 +106,7 @@ const ProfileEdit = () => {
         body: JSON.stringify({
           username: profile.username.trim(),
           profileURL: profile.profileURL,
+          bannerURL: profile.bannerURL,
         }),
       });
 
@@ -122,23 +130,59 @@ const ProfileEdit = () => {
     }
   };
 
-  const handleImageUpload = () => {
-    if (!newProfileURL.trim()) {
+  const handleImageUpload = async (type: 'profile' | 'banner') => {
+    const url = type === 'profile' ? newProfileURL : newBannerURL;
+    if (!url.trim()) {
       toast({
         title: "Validation Error",
-        description: "Please enter a valid image URL",
+        description: `Please enter a valid image URL`,
         variant: "destructive",
       });
       return;
     }
 
-    setProfile((prev) => ({ ...prev, profileURL: newProfileURL.trim() }));
-    setShowModal(false);
-    setNewProfileURL("");
-    toast({
-      title: "Success",
-      description: "Your profile picture has been changed successfully.",
-    });
+    try {
+      const res = await fetch(`${BASE_URL}/api/auth/register/${profile.id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: profile.username,
+          [type === 'profile' ? 'profileURL' : 'bannerURL']: url.trim(),
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to update image');
+      }
+
+      setProfile((prev) => ({
+        ...prev,
+        [type === 'profile' ? 'profileURL' : 'bannerURL']: url.trim(),
+      }));
+      
+      if (type === 'profile') {
+        setShowProfileModal(false);
+        setNewProfileURL("");
+      } else {
+        setShowBannerModal(false);
+        setNewBannerURL("");
+      }
+
+      toast({
+        title: "Success",
+        description: `Your ${type} picture has been updated successfully.`,
+      });
+    } catch (error) {
+      console.error('Error updating image:', error);
+      toast({
+        title: "Error",
+        description: `Failed to update ${type} picture. Please try again.`,
+        variant: "destructive",
+      });
+    }
   };
 
   if (loading) {
@@ -155,53 +199,87 @@ const ProfileEdit = () => {
 
   return (
     <ToastProvider>
-      <div className="max-w-2xl mx-auto p-6">
+      <div className="max-w-4xl mx-auto p-6">
         <motion.div
-          className="space-y-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {/* Profile Image */}
-          <Card className="relative dark:bg-[#161514]">
-            <CardHeader className="text-center">
-              <motion.div
-                className="w-24 h-24 mx-auto rounded-full overflow-hidden border border-gray-300 dark:border-zinc-700"
-                whileHover={{ scale: 1.05 }}
-              >
+          {/* Back Button */}
+          <Button
+            variant="ghost"
+            className="mb-6"
+            onClick={() => router.push('/dashboard/profile')}
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Profile
+          </Button>
+
+          {/* Banner Section */}
+          <Card className="relative mb-6 dark:bg-[#161514] overflow-hidden">
+            <div className="relative h-64 sm:h-80 w-full bg-gradient-to-r from-emerald-500 to-emerald-600">
+              {profile.bannerURL ? (
                 <Image
-                  src={
-                    profile.profileURL ||
-                    "https://i.postimg.cc/2yj6dtrv/image.jpg"
-                  }
-                  alt={`${profile.username}'s profile picture`}
-                  width={96}
-                  height={96}
-                  className="object-cover w-full h-full"
+                  src={profile.bannerURL}
+                  alt="Profile banner"
+                  fill
+                  className="object-cover w-full"
                   priority
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  style={{ objectPosition: 'center center' }}
                 />
-              </motion.div>
-            </CardHeader>
-            <CardContent className="flex justify-center">
+              ) : (
+                <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20" />
+              )}
               <Button
-                variant="outline"
-                className="flex gap-2"
-                onClick={() => setShowModal(true)}
+                variant="secondary"
+                className="absolute bottom-4 right-4 flex gap-2 z-10"
+                onClick={() => setShowBannerModal(true)}
               >
-                <Upload className="w-5 h-5" />
-                Change Photo
+                <Camera className="w-4 h-4" />
+                Change Banner
               </Button>
-            </CardContent>
+            </div>
+          </Card>
+
+          {/* Profile Image */}
+          <Card className="relative dark:bg-[#161514] mb-6">
+            <CardHeader className="text-center">
+              <div className="relative">
+                <motion.div
+                  className="relative w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-background -mt-20 shadow-xl"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <div className="w-full h-full rounded-full overflow-hidden">
+                    <Image
+                      src={profile.profileURL || "https://i.postimg.cc/2yj6dtrv/image.jpg"}
+                      alt={`${profile.username}'s profile picture`}
+                      fill
+                      className="object-cover rounded-full"
+                      priority
+                    />
+                  </div>
+                </motion.div>
+                <Button
+                  variant="outline"
+                  className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 flex items-center gap-2 bg-background hover:bg-accent"
+                  onClick={() => setShowProfileModal(true)}
+                >
+                  <Camera className="w-4 h-4" />
+                  Change Photo
+                </Button>
+              </div>
+            </CardHeader>
           </Card>
 
           {/* Profile Form */}
           <Card className="dark:bg-[#161514]">
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 pt-6">
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.2 }}
-                className="space-y-2 mt-4"
+                className="space-y-2"
               >
                 <Label htmlFor="username">Username</Label>
                 <Input
@@ -215,6 +293,7 @@ const ProfileEdit = () => {
                     }))
                   }
                   placeholder="Enter your username"
+                  className="bg-background"
                 />
               </motion.div>
 
@@ -231,14 +310,15 @@ const ProfileEdit = () => {
                   value={profile.email}
                   disabled
                   aria-label="Email (cannot be changed)"
+                  className="bg-muted"
                 />
               </motion.div>
 
-              {/* Save Button */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.4 }}
+                className="pt-4"
               >
                 <Button
                   className="w-full flex gap-2"
@@ -259,29 +339,58 @@ const ProfileEdit = () => {
           </Card>
         </motion.div>
 
-        {/* Image Upload Modal */}
-        <Dialog open={showModal} onOpenChange={setShowModal}>
-          <DialogContent className="p-6 dark:bg-[#161514]">
+        {/* Profile Image Modal */}
+        <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>
+          <DialogContent className="sm:max-w-md dark:bg-[#161514]">
             <DialogHeader>
               <DialogTitle>Change Profile Picture</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              <Label htmlFor="imageUrl">Enter Image URL</Label>
+              <Label htmlFor="profileImageUrl">Enter Image URL</Label>
               <Input
-                id="imageUrl"
+                id="profileImageUrl"
                 type="text"
-                placeholder="Paste image URL here..."
+                placeholder="Paste profile image URL here..."
                 value={newProfileURL}
                 onChange={(e) => setNewProfileURL(e.target.value)}
               />
             </div>
             <DialogFooter className="flex justify-end space-x-2 mt-4">
-              <Button variant="outline" onClick={() => setShowModal(false)}>
-                <X className="w-5 h-5" />
+              <Button variant="outline" onClick={() => setShowProfileModal(false)}>
+                <X className="w-4 h-4 mr-2" />
                 Cancel
               </Button>
-              <Button onClick={handleImageUpload}>
-                <Upload className="w-5 h-5" />
+              <Button onClick={() => handleImageUpload('profile')}>
+                <Upload className="w-4 h-4 mr-2" />
+                Upload
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Banner Image Modal */}
+        <Dialog open={showBannerModal} onOpenChange={setShowBannerModal}>
+          <DialogContent className="sm:max-w-md dark:bg-[#161514]">
+            <DialogHeader>
+              <DialogTitle>Change Banner Image</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <Label htmlFor="bannerImageUrl">Enter Image URL</Label>
+              <Input
+                id="bannerImageUrl"
+                type="text"
+                placeholder="Paste banner image URL here..."
+                value={newBannerURL}
+                onChange={(e) => setNewBannerURL(e.target.value)}
+              />
+            </div>
+            <DialogFooter className="flex justify-end space-x-2 mt-4">
+              <Button variant="outline" onClick={() => setShowBannerModal(false)}>
+                <X className="w-4 h-4 mr-2" />
+                Cancel
+              </Button>
+              <Button onClick={() => handleImageUpload('banner')}>
+                <Upload className="w-4 h-4 mr-2" />
                 Upload
               </Button>
             </DialogFooter>
