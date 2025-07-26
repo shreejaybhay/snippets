@@ -1,0 +1,384 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Reset base styles */
+html,
+body {
+  height: 100%;
+  scroll-behavior: smooth;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-y: overlay; /* This makes the scrollbar overlay the content */
+  scrollbar-gutter: stable; /* This reserves space for the scrollbar to prevent layout shift */
+}
+
+main {
+  flex: 1;
+  width: 100%;
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar - Mobile First */
+::-webkit-scrollbar {
+  width: 2px; /* Reduced from 3px */
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px; /* Reduced from 6px */
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #34d399, #059669);
+  border-radius: 4px; /* Reduced from 6px */
+  transition: background 0.3s ease-in-out;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #059669, #047857);
+}
+
+/* Tablet and Desktop scrollbar */
+@media (min-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 4px; /* Reduced from 6px */
+  }
+
+  ::-webkit-scrollbar-track {
+    border-radius: 6px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border-radius: 6px;
+  }
+}
+
+/* Large Desktop scrollbar */
+@media (min-width: 1536px) {
+  ::-webkit-scrollbar {
+    width: 6px; /* Reduced from 8px */
+  }
+}
+
+/* Adjust opacity */
+::-webkit-scrollbar-thumb {
+  opacity: 0.5;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  opacity: 1;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 10% 3.9%;
+    --radius: 0.5rem;
+
+    /* Adjusted chart colors for better contrast */
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+
+    /* Reduced grid opacity for light mode */
+    --grid-color: rgba(0, 0, 0, 0.03);
+
+    /* Hero specific colors */
+    --hero-heading: 240 10% 3.9%;
+    --hero-subheading: 142.1 76.2% 36.3%;
+    --hero-text: 240 5% 26%;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 0 0% 9%; /* Darker than #1B1B1B */
+    --foreground: 0 0% 98%;
+    --card: 0 0% 8%; /* Slightly darker than background */
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+
+    /* Chart colors remain the same */
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+
+    --grid-color: rgba(255, 255, 255, 0.02);
+
+    /* Hero specific colors */
+    --hero-heading: 0 0% 98%;
+    --hero-subheading: 142.1 70.6% 45.3%;
+    --hero-text: 240 5% 84%;
+    --sidebar-background: 0 0% 7%; /* Even darker for sidebar */
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+/* Enhanced grid background with better masking */
+.bg-grid {
+  background-image: linear-gradient(
+      to right,
+      var(--grid-color) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(
+    circle at 50% 35%,
+    black 30%,
+    rgba(0, 0, 0, 0.6) 50%,
+    transparent 70%
+  );
+}
+
+/* Additional utility classes for hero content */
+.hero-gradient {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary)) 0%,
+    hsl(var(--primary)) 50%,
+    hsl(var(--secondary)) 100%
+  );
+}
+
+.text-shadow {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 400% 400%;
+  animation: gradient 5s ease infinite;
+}
+
+@keyframes loader {
+  0%,
+  80%,
+  100% {
+    opacity: 0.75;
+    box-shadow: 0 0 #10b981;
+    height: 32px;
+  }
+  40% {
+    opacity: 1;
+    box-shadow: 0 -8px #10b981;
+    height: 40px;
+  }
+}
+
+.animate-loader {
+  animation: loader 0.8s infinite ease-in-out;
+}
+
+.delay-150 {
+  animation-delay: 0.16s;
+}
+
+.delay-300 {
+  animation-delay: 0.32s;
+}
+
+/* Add these custom styles for the Select component */
+.select-content {
+  border: 1px solid hsl(240, 3.7%, 15.9%); /* border-zinc-800 */
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); /* shadow-lg */
+  animation: enter 0.2s ease-out;
+  transform-origin: center;
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Scrollbar styles */
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+    border-radius: 3px;
+  }
+
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #374151;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Optional: Hide scrollbar during page load */
+.loading {
+  overflow: hidden !important;
+}
+
+/* Add this to your global CSS */
+pre::-webkit-scrollbar {
+  height: 0px !important; /* Hide horizontal scrollbar */
+  width: 8px; /* Keep vertical scrollbar width */
+}
+
+pre::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+pre::-webkit-scrollbar-thumb {
+  background: #666;
+  border-radius: 4px;
+}
+
+pre::-webkit-scrollbar-thumb:hover {
+  background: #888;
+}
+
+/* For Firefox */
+pre {
+  scrollbar-width: thin;
+  scrollbar-color: #666 transparent;
+}
+
+/* Add these styles to hide scrollbar but keep functionality */
+.syntax-highlighter {
+  overflow-x: auto !important;
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE and Edge */
+}
+
+.syntax-highlighter::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari and Opera */
+}
+
+/* Hide scrollbars for pre elements inside syntax highlighter */
+.syntax-highlighter pre::-webkit-scrollbar {
+  display: none !important;
+}
+
+.syntax-highlighter pre {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+/* Add or update these styles for code blocks */
+.code-block-container {
+  -ms-overflow-style: none !important; /* IE and Edge */
+  scrollbar-width: none !important; /* Firefox */
+}
+
+.code-block-container::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari and Opera */
+}
+
+/* Custom scrollbar for comments section */
+.comments-scrollbar::-webkit-scrollbar {
+  width: 3px; /* Thinner width */
+}
+
+.comments-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+.comments-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #34d399, #059669);
+  border-radius: 4px;
+  transition: background 0.3s ease-in-out;
+}
+
+.comments-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #059669, #047857);
+}
