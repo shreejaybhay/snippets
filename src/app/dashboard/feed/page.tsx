@@ -20,11 +20,9 @@ import {
   Users,
   UserPlus,
 } from "lucide-react";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import {
-  oneDark,
-  oneLight,
-} from "react-syntax-highlighter/dist/esm/styles/prism";
+import SyntaxHighlighter from "react-syntax-highlighter";
+import atomOneDark from "react-syntax-highlighter/dist/styles/atom-one-dark";
+import atomOneLight from "react-syntax-highlighter/dist/styles/atom-one-light";
 import { formatDistanceToNow } from "date-fns";
 import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
@@ -869,7 +867,7 @@ export default function FeedPage() {
               <div className="max-h-[400px] overflow-y-auto rounded-xl">
                 <SyntaxHighlighter
                   language={snippet.language.toLowerCase()}
-                  style={isDarkMode ? oneDark : oneLight}
+                  style={isDarkMode ? atomOneDark : atomOneLight}
                   customStyle={{
                     margin: 0,
                     padding: "1rem",
