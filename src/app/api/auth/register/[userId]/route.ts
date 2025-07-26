@@ -2,6 +2,13 @@ import { connectDB } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { Snippet } from "@/models/snippets";
+import { Comment } from "@/models/comments";
+import { CommentLike } from "@/models/CommentLike";
+import { Notification } from "@/models/notification";
+import { Folder } from "@/models/folder";
+import { Achievement } from "@/models/Achievement";
+import { Follow } from "@/models/Follow";
+import { ChatRoom } from "@/models/chatRoom";
 import bcrypt from "bcryptjs";
 import { getUserFromToken } from "@/utils/auth";
 import { User } from "@/models/User";
@@ -129,17 +136,91 @@ export async function DELETE(
       );
     }
 
-    // Delete all snippets created by the user
-    await Snippet.deleteMany({ userId });
+    // Start a transaction for data consistency
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-    // Remove user's ID from favorites arrays of all users
-    await User.updateMany(
-      { favorites: userId },
-      { $pull: { favorites: userId } }
-    );
+    try {
+      // 1. Delete all snippets created by the user
+      await Snippet.deleteMany({ userId }, { session });
 
-    // Finally delete the user
-    await User.deleteOne({ _id: userId });
+      // 2. Delete all comments made by the user
+      await Comment.deleteMany({ userId }, { session });
+
+      // 3. Delete all comment likes by the user
+      await CommentLike.deleteMany({ userId }, { session });
+
+      // 4. Remove user's likes from all snippets
+      await Snippet.updateMany(
+        { likes: userId },
+        { $pull: { likes: userId }, $inc: { likesCount: -1 } },
+        { session }
+      );
+
+      // 5. Remove user's ID from favorites arrays of all users
+      await User.updateMany(
+        { favorites: userId },
+        { $pull: { favorites: userId } },
+        { session }
+      );
+
+      // 6. Remove user from following/followers relationships
+      await User.updateMany(
+        { following: userId },
+        { $pull: { following: userId }, $inc: { followingCount: -1 } },
+        { session }
+      );
+
+      await User.updateMany(
+        { followers: userId },
+        { $pull: { followers: userId }, $inc: { followersCount: -1 } },
+        { session }
+      );
+
+      // 7. Delete all notifications related to the user (as actor or recipient)
+      await Notification.deleteMany(
+        { $or: [{ userId }, { actorId: userId }] },
+        { session }
+      );
+
+      // 8. Delete all folders created by the user
+      await Folder.deleteMany({ userId }, { session });
+
+      // 9. Delete all achievements for the user
+      await Achievement.deleteMany({ userId }, { session });
+
+      // 10. Delete all follow relationships involving the user
+      await Follow.deleteMany(
+        { $or: [{ followerId: userId }, { followingId: userId }] },
+        { session }
+      );
+
+      // 11. Remove user from chat rooms and update admin lists
+      await ChatRoom.updateMany(
+        { participants: userId },
+        { $pull: { participants: userId } },
+        { session }
+      );
+
+      await ChatRoom.updateMany(
+        { admins: userId },
+        { $pull: { admins: userId } },
+        { session }
+      );
+
+      // 12. Delete chat rooms created by the user (optional - you might want to transfer ownership instead)
+      await ChatRoom.deleteMany({ createdBy: userId }, { session });
+
+      // 13. Finally delete the user
+      await User.deleteOne({ _id: userId }, { session });
+
+      await session.commitTransaction();
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
 
     return NextResponse.json({
       message: "User and all associated data deleted successfully",

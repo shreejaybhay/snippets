@@ -970,7 +970,7 @@ export default function AnalyticsPage() {
                                 className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
                               >
                                 <Heart className="h-4 w-4" />
-                                <span>{comment.likes} likes</span>
+                                <span>{comment.likes || 0} likes</span>
                               </Button>
 
                               <Button
